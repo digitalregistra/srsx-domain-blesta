@@ -2395,12 +2395,12 @@ class Srsx extends RegistrarModule
         # Set base URL
         if (preg_match("/a/", $row->meta->reseller_id)) {
             $resellerId = substr($row->meta->reseller_id, 0, -1);
-            $baseUrl = "http://srb{$resellerId}.alpha.srs-x.com";
+            $baseUrl = "https://srb{$resellerId}.alpha.srs-x.com";
         } else {
             if ($row->meta->sandbox) {
                 $baseUrl = "http://srb{$row->meta->reseller_id}.srs-x.net";
             } else {
-                $baseUrl = "http://srb{$row->meta->reseller_id}.srs-x.com";
+                $baseUrl = "https://srb{$row->meta->reseller_id}.srs-x.com";
             }
         }
         $vars = $domainstatusResult->resultData;
