@@ -1,0 +1,53 @@
+<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+
+<br>
+<div class='container-fluid'>
+    <?php if($irtp_status != 'Active' && !$send_email) { ?>
+        
+        <div class="alert alert-danger text-center" role="alert">
+            <p>
+                Domain Anda masih dalam pending verifikasi. Email verifikasi telah dikirim ke email <?php echo $irtp_data->registrantEmail; ?>, 
+                silakan klik link verifikasi yang ada dalam email. Jika email tidak terverifikasi sampai <?php echo date('d M Y H:i:s', $irtp_data->raaVerificationEndTime) ?>, 
+                domain akan disuspend.
+            </p>
+        </div>
+        <?php 
+        $this->Form->Create();
+        ?>
+            <center>
+                <button class='btn btn-primary text' type='submit'>
+                    Kirim
+                </button>
+            </center>
+        <?php 
+        $this->Form->End();
+        ?>
+        <br>
+    <?php } ?>
+
+    <?php if($send_email) { ?>
+        <?php if(!$send_email_status) { ?>
+            <div class="alert alert-danger text-center" role="alert">
+                <p>
+                    Terjadi Kesalahan dalam mengirim email
+                </p>
+                <?php 
+                $this->Form->Create();
+                ?>
+                <button class='btn btn-primary' type='submit'>
+                    Kirim
+                </button>
+                <?php 
+                $this->Form->End();
+                ?>
+            </div>
+        <?php } else { ?>
+            <div class="alert alert-success text-center" role="alert">
+                <p>
+                    Email berhasil dikirim. silahkan cek email anda
+                </p>
+            </div>
+        <?php } ?>
+    <?php } ?>
+</div>
+

@@ -1,0 +1,150 @@
+<style>
+ .table td, .table th, .table tr {
+    vertical-align: middle;
+}
+
+</style>
+<div class='container-fluid'>
+<div class="tab-content margin-bottom">
+	<div class="tab-pane active" id="tabOverview">
+			
+		<?php if($init) { ?>
+			<?php if($update) { ?>
+				<div class="alert alert-warning">
+					<div align="center">
+						Anda tidak menggunakan NameServer khusus untuk Managed DNS. Silahkan klik tombol "UPDATE" untuk mengupdatenya.<br/>
+						<b>PERHATIAN:</b> mengubah NameServer dapat menyebabkan domain Anda tidak dapat diakses. Pastikan Anda mengetahui tentang pengelolaan domain sebelum melakukan update NameServer atau hubungi customer service kami untuk informasi lebih lanjut.
+						<br/>
+						<br/>
+						<?php
+						$this->Form->create();
+						?>
+							<input type="hidden" name="action" value="update"/>
+							<input type="submit" value="Update" class="btn btn-info"/>
+						<?php
+						$this->Form->end();
+						?>
+					</div>
+				</div>
+				<br>
+			<?php } ?>
+			<div class="searchbox">
+				<?php
+				$this->Form->create();
+				?>
+					<input type="hidden" name="action" value="add_dns_management">
+					<input type="submit" value="Add New Record" class="btn btn-info btn-sm">
+				<?php
+				$this->Form->end();
+				?>
+			</div>
+			<br/>
+			<div class=''>
+				<div class="dataTables_wrapper form-inline dt-bootstrap no-footer">
+					<div class="listtable">
+						<table class="table table-striped table-list">
+							<thead class='thead-light'>
+								<tr>
+									<th style="">Domain</th>
+									<th style="" class='text-center'>TTL</th>
+									<th style="" class='text-center'>Class</th>
+									<th style="" class='text-center'>Type</th>
+									<th style="" class='text-center'>Priority</th>
+									<th style="" class='text-center'>Destination</th>
+									<th style=""></th>
+								</tr>
+							</thead>
+							<tbody>
+								<?php if($count) { ?>
+									<?php foreach($list as $l) { ?>
+										<tr>
+											<td style=''><?php echo $l->record ?></td>
+											<td class="text-center"><?php echo $l->ttl ?></td>
+											<td class="text-center"><?php echo $l->class ?></td>
+											<td class="text-center"><?php echo $l->type ?></td>
+											<?php if($l->type == 'A') { ?>
+												<td> </td>
+												<td class="text-center"><?php echo $l->destination ?></td>
+											<?php } elseif ($l->type == 'AAAA') { ?>
+												<td></td>
+												<td class="text-center"><?php echo $l->destination ?></td>
+											<?php } elseif ($l->type == 'CNAME') { ?>
+												<td></td>
+												<td class="text-center"><?php echo $l->destination ?></td>
+											<?php } elseif ($l->type == 'MX') { ?>
+												<td class="text-center"><?php echo $l->preference ?></td>
+												<td class="text-center"><?php echo $l->destination ?></td>
+											<?php } elseif ($l->type == 'NS') { ?>
+												<td></td>
+												<td class="text-center"><?php echo $l->destination ?></td>
+											<?php } elseif ($l->type == 'SRV') { ?>
+												<td class="text-center"><?php echo $l->preference ?></td>
+												<td class="text-center"><?php echo $l->destination ?></td>
+											<?php } elseif ($l->type == 'TXT') { ?>
+											{elseif $service.type eq "TXT"}
+												<td class="text-center"><?php echo $l->destination ?></td>
+											<?php } ?>
+											<td class='text-right'>
+												<i class='fa fa-cog action' action='edit_dns_management' title='edit' id='<?php echo $l->dnsid ?>'></i>
+												<i class='fa fa-trash text-danger action' action='delete'  id='<?php echo $l->dnsid ?>' title='delete'></i>
+											</td>
+										</tr>
+									<?php } ?>
+								<?php } else { ?>
+									<tr>
+										<td colspan="7">no records found</td>
+									</tr>
+								<?php } ?>
+							</tbody>
+						</table>
+					</div>
+				</div>
+			</div>
+		<?php } else { ?>
+			<div class="alert alert-warning">
+				<div align="center">
+				Domain Anda belum terdaftar di sistem DNS kami, untuk memulai klik tombol "<b>START</b>"
+				<br/>
+				<br/>
+				<?php
+				$this->Form->create();
+				?>
+					<input type="hidden" name="action" value="init"/>
+					<input type="submit" value="Start" class="btn btn-info"/>
+				<?php
+				$this->Form->end();
+				?>
+				</div>
+			</div>
+		<?php } ?>
+		<br/>	
+		<br>
+	</div>
+</div>
+</div>
+
+
+<?php
+$this->Form->create(null, ['id' => 'dns_form']);
+?>
+<input type="hidden" name="action" id='action_dns' value=""/>
+<input type="hidden" name="id" id='dnsid' value=""/>
+<?php
+$this->Form->end();
+?>
+
+<script>
+$(".action").click(function() {
+	$("#action_dns").val($(this).attr('action'))
+	$("#dnsid").val($(this).attr('id'))
+	$("#dns_form").submit()
+})
+</script>
+
+<style>
+	table {
+		table-layout: fixed;
+		width: 100%;
+		word-wrap: break-word;
+	}
+</style>

@@ -1,0 +1,95 @@
+<div class="tab-content margin-bottom">
+	<div class="tab-pane active" id="tabOverview">
+	
+	<div class='container-fluid'>
+		<h3>Domain Forwarding</h3>
+
+		<?php if(!$status) { ?>
+			<div class="alert alert-info">
+				<label align="center">Click on the button below to activate the Domain Forwarding Service for <strong><?php echo $domain?></strong></label>
+			</div>
+			<br>
+            <?php
+            $this->Form->create();
+            ?>
+				<input type="hidden" name="action" value="init"/>
+				<label align="center"><input class="btn btn-info" type="submit" value="Activate Domain Forwarding"/></label>
+            <?php
+            $this->Form->end();
+            ?>
+		<?php } else { ?>
+            <?php
+            $this->Form->create();
+            ?>
+				<input type="hidden" name="action" value="update"/>
+							<div class="form-group ">
+								<h6 class='m-0'>Destination</h6>
+								<div class="m-0">
+									<label class="form-control-static">URL where you wish to forward requests for and www.<br><strong>Note</strong>: Insert the URL with http:// or https://</label>
+									<input class="form-control" name="target" type="text" value="<?php echo $record->target?>">
+								</div>
+							</div>
+							<div class="form-group ">
+								<h6 class='m-0'>URL Masking</h6>
+								<div class="m-0">
+									<label class="form-control-static">Enabling URL masking will ensure that your visitors see the source URL and not the destination URL</label>
+									<br>
+									<label class="radio-inline">
+										<input name="type" type="radio" <?php if($record->type == 'iframe') echo 'checked'; ?> id="radio" value="iframe"> Yes
+									</label>
+									<label class="radio-inline">
+										<input name="type" type="radio" <?php if($record->type == 'redirect') echo 'checked'; ?> id="radio" value="redirect" > No
+									</label>
+								</div>
+							</div>
+							<div class="form-group ">
+								<h6 class='m-0'>Header Tags</h6>
+								<div class="m-0">
+									<label class="form-control-static">Enabling URL Masking will serve a "Frames" page to the browser. You can add TITLE and META tags for your "Frames" page here.<br><strong>Examples</strong>:<br><code>&lt;title&gt;My Home page&lt;/title&gt;</code><br><code>&lt;meta name="keywords" CONTENT="keyword1, keyword2, etc."&gt;</code><br><code>&lt;meta name="description" CONTENT="website description"&gt;</code><br><strong>Note</strong>: Do not add the tags <code>&lt;head&gt;&lt;/head&gt;</code>. This will be added automatically.</label>
+									<textarea class="form-control" rows="4" name="header" id="headertags"><?php echo $record->header ?></textarea>
+								</div>
+							</div>
+							<div class="form-group ">
+								<h6 class='m-0'>No Frames Content</h6>
+								<div class="m-0">
+									<label class="form-control-static">Enabling URL masking will serve a "Frames" page to the browser. You may want to set an alternate "noframes" page content for search engines. Enter your HTML within in the "No Frames Content" box to set alternate page content.<br><strong>Note</strong>: Do not add the tags <code>&lt;noframes&gt;&lt;/noframes&gt;</code>. This will be added automatically.</label>
+									<textarea class="form-control" rows="4" name="noframe" id="noframes"><?php  echo $record->noframe; ?></textarea>
+								</div>
+							</div>
+							<div class="form-group ">
+								<h6 class='m-0'>Subdomain Forwarding</h6>
+								<div class="m-0">
+									<label class="form-control-static">Enabling Sub Domain Forwarding will forward a request made to http://subdomain. to http:///subdomain/</label>
+									<br>
+									<label class="radio-inline">
+										<input name="subdomain" type="radio" id="radio" value="1" <?php if($record->subdomain == 1) echo 'checked'; ?> > Yes
+									</label>
+									<label class="radio-inline">
+										<input name="subdomain" type="radio" id="radio" value="0" <?php if($record->subdomain == 0) echo 'checked'; ?> > No
+									</label>
+								</div>
+							</div>
+							<div class="form-group ">
+								<h6 class='m-0'>Path Forwarding</h6>
+								<div class="m-0">
+									<label class="form-control-static">Enabling Path Forwarding will forward requests made to http:///some/path to http://destination_url/some/path</label>
+									<br>
+									<label class="radio-inline">
+										<input name="path" type="radio" id="radio" value="1" <?php if($record->path == 1) echo 'checked'; ?>> Yes
+									</label>
+									<label class="radio-inline">
+										<input name="path" type="radio" id="radio" value="0" <?php if($record->path == 0) echo 'checked'; ?> > No
+									</label>
+								</div>
+							</div>
+				<div class="text-center">
+					<input type="submit" value="Save Changes" class="btn btn-success">
+				</div>
+            <?php
+            $this->Form->end();
+            ?>
+        <?php } ?>
+		<br />
+	</div>
+	</div>
+</div>

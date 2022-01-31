@@ -1,0 +1,282 @@
+<div class="tab-content margin-bottom">
+	<div class="tab-pane active" id="tabOverview">
+
+		<?php
+		$this->Form->create();
+		?>
+			<h3 class='ml-2'>
+				Modify
+				<?php if($record->type == 'SOA') { ?>
+					<?php echo "{$record->type} Record: {$domain}"; ?>
+				<?php } else { ?>
+					<?php echo "{$record->type} Record: {$record->record}"; ?>
+				<?php } ?>
+			</h3>
+			<br/>
+			<?php if(
+				$record->type == 'NS' ||
+				$record->type == 'CNAME' ||
+				$record->type == 'A' ||
+				$record->type == 'AAAA'
+			) 
+			{ ?>
+				<div class="form-group">
+					<label class="control-label col-xs-2">Domain</label>
+					<div class="col-xs-5">
+						<div class="input-group">
+							<input class="form-control" name="record" type="text" value="<?php echo str_replace("." . $domain . ".", "", $record->record) ?>"/>
+							<div class="input-group-prepend">
+								<span class="input-group-text">.<?php echo $domain ?></span>
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="form-group">
+					<label class="control-label col-xs-2">TTL</label>
+					<div class="col-xs-5">
+						<input class="form-control" name="ttl" type="text" value="<?php echo $record->ttl ?>"/>
+					</div>
+				</div>
+				<div class="form-group">
+					<label class="control-label col-xs-2">Class</label>
+					<div class="col-xs-5">
+						<input class="form-control" name="class" type="text" value="<?php echo $record->class ?>"/>
+					</div>
+				</div>
+				<div class="form-group">
+					<label class="control-label col-xs-2">Type</label>
+					<div class="col-xs-5">
+						<p class="form-control-static"><?php echo $record->type ?></p>
+					</div>
+					<input type="hidden" name="type" value="<?php echo $record->type ?>">
+				</div>
+				<div class="form-group">
+					<label class="control-label col-xs-2">Destination</label>
+					<div class="col-xs-5">
+						<input class="form-control" name="destination" type="text" value="<?php echo $record->destination ?>"/>
+					</div>
+				</div>
+			<?php } elseif ($record->type == "SOA") { ?>
+				<div class="form-group">
+					<label class="control-label col-xs-2">TTL</label>
+					<div class="col-xs-5">
+						<input class="form-control" name="ttl" type="text" value="<?php echo $record->ttl ?>"/>
+					</div>
+					<input name="record" type="hidden" value="<?php echo $record->record ?>"/>
+				</div>
+				<div class="form-group">
+					<label class="control-label col-xs-2">Class</label>
+					<div class="col-xs-5">
+						<input class="form-control" name="class" type="text" value="<?php echo $record->class ?>"/>
+					</div>
+				</div>
+				<div class="form-group">
+					<label class="control-label col-xs-2">Type</label>
+					<div class="col-xs-5">
+						<p class="form-control-static"><?php echo $record->type ?></p>
+					</div>
+					<input type="hidden" name="type" value="<?php echo $record->type ?>">
+				</div>
+				<div class="form-group">
+					<label class="control-label col-xs-2">Mname</label>
+					<div class="col-xs-5">
+						<input class="form-control" name="mname" type="text" value="<?php echo $record->mname ?>"/>
+					</div>
+				</div>
+				<div class="form-group">
+					<label class="control-label col-xs-2">Rname</label>
+					<div class="col-xs-5">
+						<input class="form-control" name="rname" type="text" value="<?php echo $record->rname ?>"/>
+					</div>
+				</div>
+				<div class="form-group">
+					<label class="control-label col-xs-2">Serial</label>
+					<div class="col-xs-5">
+						<input class="form-control" name="serial" type="text" value="<?php echo $record->serial ?>"/>
+					</div>
+				</div>
+				<div class="form-group">
+					<label class="control-label col-xs-2">Refresh</label>
+					<div class="col-xs-5">
+						<input class="form-control" name="refresh" type="text" value="<?php echo $record->refresh ?>"/>
+					</div>
+				</div>
+				<div class="form-group">
+					<label class="control-label col-xs-2">Retry</label>
+					<div class="col-xs-5">
+						<input class="form-control" name="retry" type="text" value="<?php echo $record->retry ?>"/>
+					</div>
+				</div>
+				<div class="form-group">
+					<label class="control-label col-xs-2">Expire</label>
+					<div class="col-xs-5">
+						<input class="form-control" name="expire" type="text" value="<?php echo $record->expire ?>"/>
+					</div>
+				</div>
+				<div class="form-group">
+					<label class="control-label col-xs-2">Minimum</label>
+					<div class="col-xs-5">
+						<input class="form-control" name="minimum" type="text" value="<?php echo $record->minimum ?>"/>
+					</div>
+				</div>
+				<div class="form-group">
+					<label class="control-label col-xs-2">Serial</label>
+					<div class="col-xs-5">
+						<input class="form-control" name="serial" type="text" value="<?php echo $record->serial ?>"/>
+					</div>
+				</div>
+			<? } elseif ($record->type == "MX") { ?>
+				<div class="form-group">
+					<label class="control-label col-xs-2">Domain</label>
+					<div class="col-xs-5">
+						<div class="input-group">
+							<input class="form-control" name="record" type="text" value="<?php echo $record->record ?>"/>
+							<div class="input-group-prepend">
+								<span class="input-group-text" style=""><?php echo $domain ?></span>
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="form-group">
+					<label class="control-label col-xs-2">TTL</label>
+					<div class="col-xs-5">
+						<input class="form-control" name="ttl" type="text" value="<?php echo $record->ttl ?>"/>
+					</div>
+				</div>
+				<div class="form-group">
+					<label class="control-label col-xs-2">Class</label>
+					<div class="col-xs-5">
+						<input class="form-control" name="class" type="text" value="<?php echo $record->class ?>"/>
+					</div>
+				</div>
+				<div class="form-group">
+					<label class="control-label col-xs-2">Type</label>
+					<div class="col-xs-5">
+						<p class="form-control-static"><?php echo $record->type ?></p>
+					</div>
+					<input type="hidden" name="type" value="<?php echo $record->type ?>">
+				</div>
+				<div class="form-group">
+					<label class="control-label col-xs-2">Preference</label>
+					<div class="col-xs-5">
+						<input class="form-control" name="preference" type="text" value="<?php echo $record->preference ?>"/>
+					</div>
+				</div>
+				<div class="form-group">
+					<label class="control-label col-xs-2">Hostname</label>
+					<div class="col-xs-5">
+						<input class="form-control" name="destination" type="text" value="<?php echo $record->destination ?>"/>
+					</div>
+				</div>
+			<?php } elseif ( $record->type == "SRV" ) { ?>
+				<div class="form-group">
+					<label class="control-label col-xs-2">Domain</label>
+					<div class="col-xs-5">
+						<div class="input-group">
+							<input class="form-control" name="record" type="text" value="<?php echo $record->record ?>"/>
+							<div class="input-group-prepend">
+								<span class="input-group-text" style=""><?php echo $domain ?></span>
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="form-group">
+					<label class="control-label col-xs-2">TTL</label>
+					<div class="col-xs-5">
+						<input class="form-control" name="ttl" type="text" value="<?php echo $record->ttl ?>"/>
+					</div>
+				</div>
+				<div class="form-group">
+					<label class="control-label col-xs-2">Class</label>
+					<div class="col-xs-5">
+						<input class="form-control" name="class" type="text" value="<?php echo $record->class ?>"/>
+					</div>
+				</div>
+				<div class="form-group">
+					<label class="control-label col-xs-2">Type</label>
+					<div class="col-xs-5">
+						<p class="form-control-static"><?php echo $record->type ?></p>
+					</div>
+					<input type="hidden" name="type" value="<?php echo $record->type ?>">
+				</div>
+				<div class="form-group">
+					<label class="control-label col-xs-2">Priority</label>
+					<div class="col-xs-5">
+						<input class="form-control" name="priority" type="text" value="<?php echo $record->priority ?>"/>
+					</div>
+				</div>
+				<div class="form-group">
+					<label class="control-label col-xs-2">Weight</label>
+					<div class="col-xs-5">
+						<input class="form-control" name="weight" type="text" value="<?php echo $record->weight ?>"/>
+					</div>
+				</div>
+				<div class="form-group">
+					<label class="control-label col-xs-2">Port</label>
+					<div class="col-xs-5">
+						<input class="form-control" name="port" type="text" value="<?php echo $record->port ?>"/>
+					</div>
+				</div>
+				<div class="form-group">
+					<label class="control-label col-xs-2">Hostname</label>
+					<div class="col-xs-5">
+						<input class="form-control" name="destination" type="text" value="<?php echo $record->destination ?>"/>
+					</div>
+				</div>
+			<?php } elseif ( $record->type == "TXT" ) { ?>
+				<div class="form-group">
+					<label class="control-label col-xs-2">Domain</label>
+					<div class="col-xs-5">
+						<div class="input-group">
+							<input class="form-control" name="record" type="text" value="<?php echo $record->record ?>"/>
+							<div class="input-group-prepend">
+								<span class="input-group-text" style=""><?php echo $domain ?></span>
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="form-group">
+					<label class="control-label col-xs-2">TTL</label>
+					<div class="col-xs-5">
+						<input class="form-control" name="ttl" type="text" value="<?php echo $record->ttl ?>"/>
+					</div>
+				</div>
+				<div class="form-group">
+					<label class="control-label col-xs-2">Class</label>
+					<div class="col-xs-5">
+						<input class="form-control" name="class" type="text" value="<?php echo $record->class ?>"/>
+					</div>
+				</div>
+				<div class="form-group">
+					<label class="control-label col-xs-2">Type</label>
+					<div class="col-xs-5">
+						<p class="form-control-static"><?php echo $record->type ?></p>
+					</div>
+					<input type="hidden" name="type" value="<?php echo $record->type ?>">
+				</div>
+				<div class="form-group">
+					<label class="control-label col-xs-2">Information</label>
+					<div class="col-xs-5">
+						<textarea class="form-control" name="destination"><?php echo $record->destination ?></textarea>
+					</div>
+				</div>
+			<?php } ?>
+			<div class="form-group">
+				<input type="hidden" name="dnsid" value="<?php echo $record->dnsid ?>">
+				<div class="col-xs-offset-2 col-xs-5">
+					<input type="submit" value="Apply Modification" class="btn form-control btn-success"/>
+				</div>
+			</div>
+		<?php
+		$this->Form->end();
+		?>
+		<form method="get" action="?">
+		<p class="text-center">
+			<button class="btn" type="submit">
+				<i class='fa fa-angle-double-left'></i>
+				<?php $this->_('Srsx.tab_client_contact.clientareabacklink');?>
+			</button>
+		</p>
+	</form>
+	</div>
+</div>

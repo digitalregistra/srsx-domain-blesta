@@ -1,0 +1,121 @@
+<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+<br>
+<style>
+</style>
+
+<div class='container-fluid'>
+	<div class="tab-content margin-bottom">
+		
+		<div class="card ">
+			<div class="card-header bg-secondary text-white" style='margin-left:-1px;margin-right:-1px;color:black;'>
+				Domain Forwarding
+			</div>
+			<div class="card-body">
+				<div class="tab-pane active" id="tabOverview">
+
+					<?php if(!$status) { ?>
+						<div class="alert alert-info">
+							<p class='p-0'  align="center">Click on the button below to activate the Domain Forwarding Service for <strong><?php echo $domain?></strong></p>
+						</div>
+						<?php
+						$this->Form->create();
+						?>
+							<input type="hidden" name="action" value="init"/>
+							<p class='p-0'  align="center"><input class="btn btn-info" type="submit" value="Activate Domain Forwarding"/></p>
+						<?php
+						$this->Form->end();
+						?>
+					<?php } else { ?>
+						<?php
+						$this->Form->create();
+						?>
+							<input type="hidden" name="action" value="update"/>
+								
+									
+										<div class="form-group">
+											<h4 class='p-0'  style="font-size:1.5rem;color:black">Destination</h4 style="font-size:1.5rem;color:black">
+											<div class="col-xs-8">
+												<p class='p-0'  class="form-control-static">URL where you wish to forward requests for and www.<br><strong>Note</strong>: Insert the URL with http:// or https://</p>
+												<input class="form-control" style='height:30px;width:100%' name="target" type="text" value="<?php echo $record->target?>">
+											</div>
+										</div>
+									
+								
+								
+									
+										<div class="form-group">
+											<h4 class='p-0'  style="font-size:1.5rem;color:black">URL Masking</h4 style="font-size:1.5rem;color:black">
+											<div class="col-xs-8">
+												<p class='p-0'  class="form-control-static">Enabling URL masking will ensure that your visitors see the source URL and not the destination URL</p>
+												<label class="radio-inline">
+													<input name="type" type="radio" <?php if($record->type == 'iframe') echo 'checked'; ?> id="radio" value="iframe"> Yes
+													<input name="type" type="radio" class='ml-1' <?php if($record->type == 'redirect') echo 'checked'; ?> id="radio" value="redirect" > No
+												</label>
+											</div>
+										</div>
+									
+								
+								
+									
+										<div class="form-group">
+											<h4 class='p-0'  style="font-size:1.5rem;color:black">Header Tags</h4 style="font-size:1.5rem;color:black">
+											<div class="col-xs-8">
+												<p class='p-0'  class="form-control-static">Enabling URL Masking will serve a "Frames" page to the browser. You can add TITLE and META tags for your "Frames" page here.<br><strong>Examples</strong>:<br><code>&lt;title&gt;My Home page&lt;/title&gt;</code><br><code>&lt;meta name="keywords" CONTENT="keyword1, keyword2, etc."&gt;</code><br><code>&lt;meta name="description" CONTENT="website description"&gt;</code><br><strong>Note</strong>: Do not add the tags <code>&lt;head&gt;&lt;/head&gt;</code>. This will be added automatically.</p>
+												<textarea class="form-control" rows="4" name="header" id="headertags"><?php echo $record->header ?></textarea>
+											</div>
+										</div>
+									
+								
+								
+									
+										<div class="form-group">
+											<h4 class='p-0'  style="font-size:1.5rem;color:black">No Frames Content</h4 style="font-size:1.5rem;color:black">
+											<div class="col-xs-8">
+												<p class='p-0'  class="form-control-static">Enabling URL masking will serve a "Frames" page to the browser. You may want to set an alternate "noframes" page content for search engines. Enter your HTML within in the "No Frames Content" box to set alternate page content.<br><strong>Note</strong>: Do not add the tags <code>&lt;noframes&gt;&lt;/noframes&gt;</code>. This will be added automatically.</p>
+												<textarea class="form-control" rows="4" name="noframe" id="noframes"><?php  echo $record->noframe; ?></textarea>
+											</div>
+										</div>
+									
+								
+								
+									
+										<div class="form-group">
+											<h4 class='p-0'  style="font-size:1.5rem;color:black">Subdomain Forwarding</h4 style="font-size:1.5rem;color:black">
+											<div class="col-xs-8">
+												<p class='p-0'  class="form-control-static">Enabling Sub Domain Forwarding will forward a request made to http://subdomain. to http:///subdomain/</p>
+												<label class="radio-inline">
+													<input name="subdomain" type="radio" id="radio" value="1" <?php if($record->subdomain == 1) echo 'checked'; ?> > Yes
+													<input name="subdomain" class='ml-1' type="radio" id="radio" value="0" <?php if($record->subdomain == 0) echo 'checked'; ?> > No
+												</label>
+											</div>
+										</div>
+									
+								
+								
+									
+										<div class="form-group">
+											<h4 class='p-0'  style="font-size:1.5rem;color:black">Path Forwarding</h4 style="font-size:1.5rem;color:black">
+											<div class="col-xs-8">
+												<p class='p-0'  class="form-control-static">Enabling Path Forwarding will forward requests made to http:///some/path to http://destination_url/some/path</p>
+												<label class="radio-inline">
+													<input name="path" type="radio" id="radio" value="1" <?php if($record->path == 1) echo 'checked'; ?>> Yes
+													<input name="path" class='ml-1' type="radio" id="radio" value="0" <?php if($record->path == 0) echo 'checked'; ?> > No
+												</label>
+											</div>
+										</div>
+									
+								
+							<div class="text-center">
+								<input type="submit" value="Save Changes" class="btn btn-success">
+							</div>
+						<?php
+						$this->Form->end();
+						?>
+					<?php } ?>
+					<br />
+				
+				</div>
+			</div>
+		</div>
+	</div>
+</div>

@@ -1,0 +1,117 @@
+<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+
+<div class='container-fluid'>
+
+    <div class="card my-4">
+        <div class="card-header bg-secondary text-white" style='margin-left:-1px;margin-right:-1px;color:black;'>
+            WHOIS
+        </div>
+        <div class="card-body">
+			<div class="tab-content margin-bottom">
+				<div id="tabs">
+					<ul class="nav nav-tabs">
+						<li class="nav-item active" href="?action=changecontact&view=/contact/admin/tab_contact_change">
+							<a class="nav-link active">
+								Change Contacts
+							</a>
+						</li>
+						<li class="nav-item">
+							<a class="nav-link" href="?action=modifycontact&view=/contact/admin/tab_contact_modify">
+								Modify Contact
+							</a>
+						</li>
+						<li class="nav-item">
+							<a class="nav-link" href="?action=deletecontact&view=/contact/admin/tab_contact_delete">
+								Delete Contact
+							</a>
+						</li>
+						<li class="nav-item">
+							<a class="nav-link" href="?action=createcontact&view=/contact/admin/tab_contact_create">
+								Create Contact
+							</a>
+						</li>
+					</ul>
+				</div>
+				<h3 class='mt-2'>Change Contacts</h3>
+				<p class='p-0'><?php $this->_('Srsx.tab_client_contact.changecontact_desc');?></p>
+					<?php
+					$this->Form->create();
+					?>
+						<div class="form-group">
+							<label class="col-xs-3 control-label">Registrant (reg-c)</label>
+							<div class="col-xs-6">
+								<select class="form-control" name="registrantContactId" id="registrantContactId">
+									<?php foreach($contact as $key => $c) { ?>
+											<?php if($c->contactid == (string)$domain->contact_registrant) { ?>
+												<option selected value="<?php echo $c->contactid ?>">#<?php echo $c->contactid ?> <?php echo $c->fname ?> <?php echo $c->lname ?> <?php echo $c->email ?></option>
+											<?php } else { ?>
+												<option value="<?php echo $c->contactid ?>">#<?php echo $c->contactid ?> <?php echo $c->fname ?> <?php echo $c->lname ?> <?php echo $c->email ?></option>
+											<?php } ?>
+									<?php } ?>
+								</select>
+							</div>
+						</div>
+						<div class="form-group">
+							<label class="col-xs-3 control-label">Administrator (admin-c)</label>
+							<div class="col-xs-6">
+								<select class="form-control" name="adminContactId" id="adminContactId">
+									<?php foreach($contact as $key => $c) { ?>
+											<?php if($c->contactid == (string)$domain->contact_admin) { ?>
+												<option selected value="<?php echo $c->contactid ?>">#<?php echo $c->contactid ?> <?php echo $c->fname ?> <?php echo $c->lname ?> <?php echo $c->email ?></option>
+											<?php } else { ?>
+												<option value="<?php echo $c->contactid ?>">#<?php echo $c->contactid ?> <?php echo $c->fname ?> <?php echo $c->lname ?> <?php echo $c->email ?></option>
+											<?php } ?>
+									<?php } ?>
+								</select>
+							</div>
+						</div>
+						<div class="form-group">
+							<label class="col-xs-3 control-label">Technical (tech-c)</label>
+							<div class="col-xs-6">
+								<select class="form-control" name="techContactId" id="techContactId">
+									<?php foreach($contact as $key => $c) { ?>
+											<?php if($c->contactid == (string)$domain->contact_tech) { ?>
+												<option selected value="<?php echo $c->contactid ?>">#<?php echo $c->contactid ?> <?php echo $c->fname ?> <?php echo $c->lname ?> <?php echo $c->email ?></option>
+											<?php } else { ?>
+												<option value="<?php echo $c->contactid ?>">#<?php echo $c->contactid ?> <?php echo $c->fname ?> <?php echo $c->lname ?> <?php echo $c->email ?></option>
+											<?php } ?>
+									<?php } ?>
+								</select>
+							</div>
+						</div>
+						<div class="form-group">
+							<label class="col-xs-3 control-label">Billing (bill-c)</label>
+							<div class="col-xs-6">
+								<select class="form-control" name="billingContactId" id="billingContactId">
+									<?php foreach($contact as $key => $c) { ?>
+											<?php if($c->contactid == (string)$domain->contact_billing) { ?>
+												<option selected value="<?php echo $c->contactid ?>">#<?php echo $c->contactid ?> <?php echo $c->fname ?> <?php echo $c->lname ?> <?php echo $c->email ?></option>
+											<?php } else { ?>
+												<option value="<?php echo $c->contactid ?>">#<?php echo $c->contactid ?> <?php echo $c->fname ?> <?php echo $c->lname ?> <?php echo $c->email ?></option>
+											<?php } ?>
+									<?php } ?>
+								</select>
+							</div>
+						</div>
+						<br>
+						<p class="text-center">
+							<input class="btn btn-success" type="submit" value="<?php $this->_('Srsx.tab_client_contact.clientareasavechanges');?>"/>
+						</p>
+					<?php
+					$this->Form->end();
+					?>
+				
+				
+				<form method="get" action="?">
+					<p class="text-center">
+						<button class="btn" type="submit">
+							<i class='fa fa-angle-double-left'></i>
+							<?php $this->_('Srsx.tab_client_contact.clientareabacklink');?>
+						</button>
+					</p>
+				</form>
+
+			</div>
+		</div>
+	</div>
+</div>

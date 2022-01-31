@@ -1,0 +1,65 @@
+
+    <?php
+    $this->Form->create();
+    ?>
+    <style>
+        label {
+            font-size:15px
+        }
+    </style>
+    <div class="card mx-auto my-4" style='width:40%'>
+        <div class="card-header bg-secondary text-white" style='margin-left:-1px;margin-right:-1px;color:black;'>
+            Registrar Lock
+        </div>
+        <div class="card-body">
+            <div class="pad">
+                <ul>
+                    <li>
+                        <?php
+
+                        $this->Form->fieldRadio('registrar_lock', 'true', $this->Html->ifSet($vars->registrar_lock) == 'true', ['id' => 'registrar_lock_yes']);
+                        $this->Form->label($this->_('Srsx.tab_settings.field_registrar_lock_yes', true), 'registrar_lock_yes', ['class' => 'inline', 'style' => 'font-size:14px;']);
+                        ?>
+                    </li>
+                    <li>
+                        <?php
+                        $this->Form->fieldRadio('registrar_lock', 'false', $this->Html->ifSet($vars->registrar_lock) == 'false', ['id' => 'registrar_lock_no']);
+                        $this->Form->label($this->_('Srsx.tab_settings.field_registrar_lock_no', true), 'registrar_lock_no', ['class' => 'inline', 'style' => 'font-size:14px;']);
+                        ?>
+                    </li>
+                    <li>
+                        <?php
+                        $this->Form->fieldCheckbox('request_epp', 'true', $this->Html->ifSet($vars->request_epp) == 'true', ['id' => 'request_epp']);
+                        $this->Form->label($this->_('Srsx.tab_settings.field_request_epp', true), 'request_epp', ['class' => 'inline', 'style' => 'font-size:14px;']);
+                        ?>
+                        <strong class="epp_code" style="display: none;font-size:14px"><?php $this->Html->_($vars->epp_code);?></strong>
+                    </li>
+                </ul>
+            </div>
+            <div class="button_row">
+                <?php
+                $this->Form->fieldSubmit('save', $this->_('Srsx.tab_settings.field_submit', true), ['class' => 'btn btn-primary pull-right']);
+                ?>
+            </div>
+            <?php
+            $this->Form->end();
+            ?>
+        </div>
+    </div>
+
+    <script type="text/javascript">
+        $(document).ready(function() {
+
+            showEpp();
+            $("#request_epp").change(function() {
+                showEpp();
+            });
+
+            function showEpp() {
+                if ($("#request_epp").is(":checked"))
+                    $(".epp_code").show();
+                else
+                    $(".epp_code").hide();
+            }
+        });
+    </script>

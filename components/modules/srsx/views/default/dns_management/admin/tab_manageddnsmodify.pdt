@@ -1,0 +1,312 @@
+<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+<br>
+
+<div class='container-fluid'>
+	<div class="tab-content margin-bottom">
+		<div class="tab-pane active" id="tabOverview">
+			
+			<div class="card ">
+				<div class="card-header bg-secondary text-white" style='margin-left:-1px;margin-right:-1px;color:black;'>
+					Modify
+					<?php if($record->type == 'SOA') { ?>
+						<?php echo "{$record->type} Record: {$domain}"; ?>
+					<?php } else { ?>
+						<?php echo "{$record->type} Record: {$record->record}"; ?>
+					<?php } ?>
+				</div>
+				<div class="card-body">
+					<?php
+					$this->Form->create();
+					?>
+						<?php if(
+							$record->type == 'NS' ||
+							$record->type == 'CNAME' ||
+							$record->type == 'A' ||
+							$record->type == 'AAAA'
+						) 
+						{ ?>
+						<div class="row">
+							<div class='col-md-6'>
+								<div class="form-group">
+									<label style='font-size:18px'  class=" col-xs-2">Domain</label>
+									<div class="col-xs-5">
+										<div class="input-group">
+											<input style='height:35px;'  class="form-control" name="record" type="text" value="<?php echo str_replace("." . $domain . ".", "", $record->record) ?>"/>
+											<div class="input-group-prepend">
+												<span  style='height:35px' class="input-group-text">.<?php echo $domain ?></span>
+											</div>
+										</div>
+									</div>
+								</div>
+								<div class="form-group">
+									<label style='font-size:18px'  class=" col-xs-2">TTL</label>
+									<div class="col-xs-5">
+										<input style='height:35px;width:100%'  class="form-control" name="ttl" type="text" value="<?php echo $record->ttl ?>"/>
+									</div>
+								</div>
+								<div class="form-group">
+									<label style='font-size:18px'  class=" col-xs-2">Class</label>
+									<div class="col-xs-5">
+										<input style='height:35px;width:100%'  class="form-control" name="class" type="text" value="<?php echo $record->class ?>"/>
+									</div>
+								</div>
+							</div>
+							<div class='col-md-6'>
+								<div class="form-group">
+									<label style='font-size:18px'  class=" col-xs-2">Type</label>
+									<div class="col-xs-5">
+										<p class="form-control-static"><?php echo $record->type ?></p>
+									</div>
+									<input style='height:35px'  type="hidden" name="type" value="<?php echo $record->type ?>">
+								</div>
+								<div class="form-group">
+									<label style='font-size:18px'  class=" col-xs-2">Destination</label>
+									<div class="col-xs-5">
+										<input style='height:35px;width:100%'  class="form-control" name="destination" type="text" value="<?php echo $record->destination ?>"/>
+									</div>
+								</div>
+							</div>
+						</div>
+						<?php } elseif ($record->type == "SOA") { ?>
+						<div class="row">
+							<div class='col-md-6'>
+								<div class="form-group">
+									<label style='font-size:18px'  class=" col-xs-2">TTL</label>
+									<div class="col-xs-5">
+										<input style='height:35px;width:100%'  class="form-control" name="ttl" type="text" value="<?php echo $record->ttl ?>"/>
+									</div>
+									<input style='height:35px'  name="record" type="hidden" value="<?php echo $record->record ?>"/>
+								</div>
+								<div class="form-group">
+									<label style='font-size:18px'  class=" col-xs-2">Class</label>
+									<div class="col-xs-5">
+										<input style='height:35px;width:100%'  class="form-control" name="class" type="text" value="<?php echo $record->class ?>"/>
+									</div>
+								</div>
+								<div class="form-group">
+									<label style='font-size:18px'  class=" col-xs-2">Type</label>
+									<div class="col-xs-5">
+										<p class="form-control-static"><?php echo $record->type ?></p>
+									</div>
+									<input style='height:35px'  type="hidden" name="type" value="<?php echo $record->type ?>">
+								</div>
+								<div class="form-group">
+									<label style='font-size:18px'  class=" col-xs-2">Mname</label>
+									<div class="col-xs-5">
+										<input style='height:35px;width:100%'  class="form-control" name="mname" type="text" value="<?php echo $record->mname ?>"/>
+									</div>
+								</div>
+								<div class="form-group">
+									<label style='font-size:18px'  class=" col-xs-2">Rname</label>
+									<div class="col-xs-5">
+										<input style='height:35px;width:100%'  class="form-control" name="rname" type="text" value="<?php echo $record->rname ?>"/>
+									</div>
+								</div>
+							</div>
+							<div class='col-md-6'>
+								<div class="form-group">
+									<label style='font-size:18px'  class=" col-xs-2">Serial</label>
+									<div class="col-xs-5">
+										<input style='height:35px;width:100%'  class="form-control" name="serial" type="text" value="<?php echo $record->serial ?>"/>
+									</div>
+								</div>
+								<div class="form-group">
+									<label style='font-size:18px'  class=" col-xs-2">Refresh</label>
+									<div class="col-xs-5">
+										<input style='height:35px;width:100%'  class="form-control" name="refresh" type="text" value="<?php echo $record->refresh ?>"/>
+									</div>
+								</div>
+								<div class="form-group">
+									<label style='font-size:18px'  class=" col-xs-2">Retry</label>
+									<div class="col-xs-5">
+										<input style='height:35px;width:100%'  class="form-control" name="retry" type="text" value="<?php echo $record->retry ?>"/>
+									</div>
+								</div>
+								<div class="form-group">
+									<label style='font-size:18px'  class=" col-xs-2">Expire</label>
+									<div class="col-xs-5">
+										<input style='height:35px;width:100%'  class="form-control" name="expire" type="text" value="<?php echo $record->expire ?>"/>
+									</div>
+								</div>
+								<div class="form-group">
+									<label style='font-size:18px'  class=" col-xs-2">Minimum</label>
+									<div class="col-xs-5">
+										<input style='height:35px;width:100%'  class="form-control" name="minimum" type="text" value="<?php echo $record->minimum ?>"/>
+									</div>
+								</div>
+								<div class="form-group">
+									<label style='font-size:18px'  class=" col-xs-2">Serial</label>
+									<div class="col-xs-5">
+										<input style='height:35px;width:100%'  class="form-control" name="serial" type="text" value="<?php echo $record->serial ?>"/>
+									</div>
+								</div>
+							</div>
+						</div>
+						<? } elseif ($record->type == "MX") { ?>
+							<div class="form-group">
+								<label style='font-size:18px'  class=" col-xs-2">Domain</label>
+								<div class="col-xs-5">
+									<div class="input-group">
+										<input style='height:35px;'  class="form-control" name="record" type="text" value="<?php echo $record->record ?>"/>
+										<div class="input-group-prepend">
+											<span class="input-group-text" style="height:35px"><?php echo $domain ?></span>
+										</div>
+									</div>
+								</div>
+							</div>
+							<div class="form-group">
+								<label style='font-size:18px'  class=" col-xs-2">TTL</label>
+								<div class="col-xs-5">
+									<input style='height:35px;width:100%'  class="form-control" name="ttl" type="text" value="<?php echo $record->ttl ?>"/>
+								</div>
+							</div>
+							<div class="form-group">
+								<label style='font-size:18px'  class=" col-xs-2">Class</label>
+								<div class="col-xs-5">
+									<input style='height:35px;width:100%'  class="form-control" name="class" type="text" value="<?php echo $record->class ?>"/>
+								</div>
+							</div>
+							<div class="form-group">
+								<label style='font-size:18px'  class=" col-xs-2">Type</label>
+								<div class="col-xs-5">
+									<p class="form-control-static"><?php echo $record->type ?></p>
+								</div>
+								<input style='height:35px'  type="hidden" name="type" value="<?php echo $record->type ?>">
+							</div>
+							<div class="form-group">
+								<label style='font-size:18px'  class=" col-xs-2">Preference</label>
+								<div class="col-xs-5">
+									<input style='height:35px;width:100%'  class="form-control" name="preference" type="text" value="<?php echo $record->preference ?>"/>
+								</div>
+							</div>
+							<div class="form-group">
+								<label style='font-size:18px'  class=" col-xs-2">Hostname</label>
+								<div class="col-xs-5">
+									<input style='height:35px;width:100%'  class="form-control" name="destination" type="text" value="<?php echo $record->destination ?>"/>
+								</div>
+							</div>
+						<?php } elseif ( $record->type == "SRV" ) { ?>
+						
+						<div class='row'>
+							<div class='col-md-6'>
+								<div class="form-group">
+									<label style='font-size:18px'  class=" col-xs-2">Domain</label>
+									<div class="col-xs-5">
+										<div class="input-group">
+											<input style='height:35px;'  class="form-control" name="record" type="text" value="<?php echo $record->record ?>"/>
+											<div class="input-group-prepend">
+												<span class="input-group-text" style="height:35px"><?php echo $domain ?></span>
+											</div>
+										</div>
+									</div>
+								</div>
+								<div class="form-group">
+									<label style='font-size:18px'  class=" col-xs-2">TTL</label>
+									<div class="col-xs-5">
+										<input style='height:35px;width:100%'  class="form-control" name="ttl" type="text" value="<?php echo $record->ttl ?>"/>
+									</div>
+								</div>
+								<div class="form-group">
+									<label style='font-size:18px'  class=" col-xs-2">Class</label>
+									<div class="col-xs-5">
+										<input style='height:35px;width:100%'  class="form-control" name="class" type="text" value="<?php echo $record->class ?>"/>
+									</div>
+								</div>
+								<div class="form-group">
+									<label style='font-size:18px'  class=" col-xs-2">Type</label>
+									<div class="col-xs-5">
+										<p class="form-control-static"><?php echo $record->type ?></p>
+									</div>
+									<input style='height:35px'  type="hidden" name="type" value="<?php echo $record->type ?>">
+								</div>
+							</div>
+							<div class='col-md-6'>
+								<div class="form-group">
+									<label style='font-size:18px'  class=" col-xs-2">Priority</label>
+									<div class="col-xs-5">
+										<input style='height:35px;width:100%'  class="form-control" name="priority" type="text" value="<?php echo $record->priority ?>"/>
+									</div>
+								</div>
+								<div class="form-group">
+									<label style='font-size:18px'  class=" col-xs-2">Weight</label>
+									<div class="col-xs-5">
+										<input style='height:35px;width:100%'  class="form-control" name="weight" type="text" value="<?php echo $record->weight ?>"/>
+									</div>
+								</div>
+								<div class="form-group">
+									<label style='font-size:18px'  class=" col-xs-2">Port</label>
+									<div class="col-xs-5">
+										<input style='height:35px;width:100%'  class="form-control" name="port" type="text" value="<?php echo $record->port ?>"/>
+									</div>
+								</div>
+								<div class="form-group">
+									<label style='font-size:18px'  class=" col-xs-2">Hostname</label>
+									<div class="col-xs-5">
+										<input style='height:35px;width:100%'  class="form-control" name="destination" type="text" value="<?php echo $record->destination ?>"/>
+									</div>
+								</div>
+							</div>
+						</div>
+						<?php } elseif ( $record->type == "TXT" ) { ?>
+						
+						<div class='row'>
+							<div class='col-md-6'>
+								<div class="form-group">
+									<label style='font-size:18px'  class=" col-xs-2">Domain</label>
+									<div class="col-xs-5">
+										<div class="input-group">
+											<input style='height:35px'  class="form-control" name="record" type="text" value="<?php echo $record->record ?>"/>
+											<div class="input-group-prepend">
+												<span class="input-group-text" style="height:35px"><?php echo $domain ?></span>
+											</div>
+										</div>
+									</div>
+								</div>
+								<div class="form-group">
+									<label style='font-size:18px'  class=" col-xs-2">TTL</label>
+									<div class="col-xs-5">
+										<input style='height:35px;width:100%'  class="form-control" name="ttl" type="text" value="<?php echo $record->ttl ?>"/>
+									</div>
+								</div>
+								<div class="form-group">
+									<label style='font-size:18px'  class=" col-xs-2">Class</label>
+									<div class="col-xs-5">
+										<input style='height:35px;width:100%'  class="form-control" name="class" type="text" value="<?php echo $record->class ?>"/>
+									</div>
+								</div>
+							</div>
+							<div class='col-md-6'>
+								<div class="form-group">
+									<label style='font-size:18px'  class=" col-xs-2">Type</label>
+									<div class="col-xs-5">
+										<p class="form-control-static"><?php echo $record->type ?></p>
+									</div>
+									<input style='height:35px'  type="hidden" name="type" value="<?php echo $record->type ?>">
+								</div>
+								<div class="form-group">
+									<label style='font-size:18px'  class=" col-xs-2">Information</label>
+									<div class="col-xs-5">
+										<textarea class="form-control" name="destination"><?php echo $record->destination ?></textarea>
+									</div>
+								</div>
+							</div>
+						</div>
+						<?php } ?>
+						<div class='row justify-content-center'>
+							<input style='height:35px'  type="hidden" name="dnsid" value="<?php echo $record->dnsid ?>">
+							<a href='?' role='button' class="btn btn-secondary mr-2" >
+								<i class='fa fa-angle-double-left'></i>
+								<?php $this->_('Srsx.tab_client_contact.clientareabacklink');?>
+							</a>
+							<input style='height:35px'  type="submit" value="Apply Modification" class="btn btn-success"/>
+							
+						</div>
+					<?php
+					$this->Form->end();
+					?>
+				</div>
+			</div>
+
+		</div>
+	</div>
+</div>

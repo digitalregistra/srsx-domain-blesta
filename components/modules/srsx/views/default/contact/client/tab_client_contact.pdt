@@ -1,0 +1,122 @@
+<div class="tab-content margin-bottom">
+	<div id="tabs">
+		<ul class="nav nav-tabs">
+			<li class="nav-item <?php if($_GET['tab'] == 1) echo 'active'; ?> " ><a class='nav-link <?php if($_GET['tab'] == 1) echo 'active'; ?> ' href="?tab=1">Registrant</a></li>
+			<li class="nav-item <?php if($_GET['tab'] == 2) echo 'active'; ?> " ><a class='nav-link <?php if($_GET['tab'] == 2) echo 'active'; ?> ' href="?tab=2">Administrator</a></li>
+			<li class="nav-item <?php if($_GET['tab'] == 3) echo 'active'; ?> " ><a class='nav-link <?php if($_GET['tab'] == 3) echo 'active'; ?> ' href="?tab=3">Technical</a></li>
+			<li class="nav-item <?php if($_GET['tab'] == 4) echo 'active'; ?> " ><a class='nav-link <?php if($_GET['tab'] == 4) echo 'active'; ?> ' href="?tab=4">Billing</a></li>
+		</ul>
+	</div>
+
+	<div class='container-fluid'>
+        <h2 class='mt-2'>
+            <?php
+                if($_GET['tab'] == 1) {
+                    echo "Registrant";
+                } else if($_GET['tab'] == 2) {
+                    echo "Administrator";
+                } else if($_GET['tab'] == 3) {
+                    echo "Technical";
+                } else if($_GET['tab'] == 4) {
+                    echo "Billing";
+                }
+            ?>
+        </h2>
+        <p>These contacts are currently associated with this domain name record. To modify, delete, create or change Association for the domain contacts, click on the &quot;Manage Domain Contacts&quot; button at the bottom of this page.<ul><li>Registrant - Is the legal owner or domain license holder</li><li>Administrator - Is the Domain Name Manager</li><li>Technical Contact - Manager of technical issues</li><li>Billing Contact - Is authorized to receive renewal invoices</li></ul></p>
+        <h3>
+            <?php
+                if($_GET['tab'] == 1) {
+                    echo "Registrant (reg-c)";
+                } else if($_GET['tab'] == 2) {
+                    echo "Administrator (admin-c)";
+                } else if($_GET['tab'] == 3) {
+                    echo "Technical (tech-c)";
+                } else if($_GET['tab'] == 4) {
+                    echo "Billing (bill-c)";
+                }
+            ?>
+            Contact Details
+        </h3>
+        <form class="form-horizontal">
+            <table style='width:100%;border:none'>
+                <tbody>
+                    <tr>
+                        <td style="width:130px">Full Name </td>
+                        <td>:</td>
+                        <td> <?php echo "{$contact->fname} {$contact->lname} " ?></td>
+                    </tr>
+                    <tr>
+                        <td>Company Name </td>
+                        <td>:</td>
+                        <td> <?php echo " {$contact->company}" ?></td>
+                    </tr>
+                    <tr>
+                        <td>Email </td>
+                        <td>:</td>
+                        <td> <?php echo " {$contact->email}" ?></td>
+                    </tr>
+                    <tr>
+                        <td>Address1 </td>
+                        <td>:</td>
+                        <td> <?php echo " {$contact->address1}" ?></td>
+                    </tr>
+                    <tr>
+                        <td>Address2 </td>
+                        <td>:</td>
+                        <td> <?php echo " {$contact->address2}" ?></td>
+                    </tr>
+                    <tr>
+                        <td>Address3 </td>
+                        <td>:</td>
+                        <td> <?php echo " {$contact->address3}" ?></td>
+                    </tr>
+                    <tr>
+                        <td>Zip Code </td>
+                        <td>:</td>
+                        <td> <?php echo " {$contact->postcode}" ?></td>
+                    </tr>
+                    <tr>
+                        <td>Email </td>
+                        <td>:</td>
+                        <td> <?php echo " {$contact->email}" ?></td>
+                    </tr>
+                    <tr>
+                        <td>City </td>
+                        <td>:</td>
+                        <td> <?php echo " {$contact->city}" ?></td>
+                    </tr>
+                    <tr>
+                        <td>State </td>
+                        <td>:</td>
+                        <td> <?php echo " {$contact->state}" ?></td>
+                    </tr>
+                    <tr>
+                        <td>Country </td>
+                        <td>:</td>
+                        <td> <?php echo " {$contact->country}" ?></td>
+                    </tr>
+                    <tr>
+                        <td>Phone Number </td>
+                        <td>:</td>
+                        <td> <?php echo " {$contact->phonenumber}" ?></td>
+                    </tr>
+                    <tr>
+                        <td>Email </td>
+                        <td>:</td>
+                        <td> <?php echo " {$contact->email}" ?></td>
+                    </tr>
+                    <tr>
+                        <td>Fax </td>
+                        <td>:</td>
+                        <td> <?php echo " {$contact->fax}" ?></td>
+                    </tr>
+                </tbody>
+            </table>
+        </form>
+
+
+        <p class="text-center">
+            <a class="btn btn-info" href="?action=changecontact">Manage Domain Contacts</a>
+        </p>
+    </div>
+</div>

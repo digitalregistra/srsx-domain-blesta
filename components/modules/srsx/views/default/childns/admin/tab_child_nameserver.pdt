@@ -1,0 +1,179 @@
+<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+<br>
+
+<div class='container-fluid'>
+	<div class="tab-content margin-bottom">
+		<div class="tab-pane active" id="tabOverview">
+			<!-- Info NS -->
+			<div class="alert alert-info" align="center">
+				From here you can create and manage custom nameservers for your domain (eg. NS1.yourdomain.com, NS2.yourdomain.com, etc.)
+			</div>
+			
+				<div class="row">
+					
+					<div class='col-md-6'>
+						<div class="card ">
+							<div class="card-header bg-secondary text-white" style='margin-left:-1px;margin-right:-1px;color:black;'>
+								NameServer List
+							</div>
+							<div class="card-body">
+								<?php if(isset($response[0])) { ?>
+									<table class='table table-stripped'>
+										<thead class='thead-light'>
+											<tr>
+												<th scope='col'>Nameserver</th>
+												<th scope='col'>IP</th>
+												<th scope='col' class='text-right'>Action</th>
+											</tr>
+										</thead>
+										<tbody>
+										<?php foreach($response as $key => $r) { ?>
+											<tr>
+												<td>
+													<?php echo (string)$r->ns ?>
+												</td>
+												<td>
+													<?php echo (string)$r->ip ?>
+												</td>
+												<td class='text-right'>
+													<i class='edit_ns fa fa-cog mr-1' title='edit' ip='<?php echo $r->ip?>' ns='<?php echo str_replace("." . $domain, "", $r->ns) ?>'></i>
+													<i class='delete fa fa-trash text-danger' ns='<?php echo str_replace("." . $domain, "", $r->ns) ?>' onclick="$(this).closest('form').submit()" title='delete'></i>
+												</td>
+											</tr>
+										<?php } ?>
+										</tbody>
+									</table>
+								<?php } else { ?>
+									<div class="alert alert-warning">
+										<p>Belum ada child yang terdaftar</p>
+									</div>
+								<?php } ?>
+							</div>
+						</div>
+					</div>
+					<div class='col-md-6'>
+
+						<div class="card ">
+							<div class="card-header bg-secondary text-white" style='margin-left:-1px;margin-right:-1px;color:black;'>
+								Register a NameServer Name
+							</div>
+							<div class="card-body">
+							<!-- Register Nameserver -->
+								<?php
+								$this->Form->create();
+								?>
+									<input type="hidden" name="registerns" value="true">
+									<input type="hidden" name="domainid" value="{$domainid}">
+									<input type="hidden" name="domain" value="<?php echo $domain ?>">
+									<div class="form-group">
+										<label style='font-size:18px'   class="col-xs-4 " for="inputRegisterNs">Nameserver</label>
+
+										<input class="form-control" type="hidden" id="inputRegisterNs" name="action" value='register'>
+										<div class="col-xs-5">
+											<div class="input-group">
+												<input class="form-control" style='height:35px' type="text" id="inputRegisterNs" name="nameserver">
+												<div class="input-group-prepend">
+													<span class="input-group-text" style='height:35px'>.<?php echo $domain ?></span>
+												</div>
+											</div>
+										</div>
+									</div>
+									<div class="form-group">
+										<label style='font-size:18px'   class="col-xs-4 " for="inputRegisterIp">IP Address</label>
+											<div class="col-xs-5">
+												<input class="form-control" style='height:35px;width:100%' type="text" id="inputRegisterIp" name="ipaddress">
+											</div>
+									</div>
+									<div class="form-group">
+										<div class="col-xs-5">
+											<div class="input-group">
+												<input class="btn btn-primary form-control" style='height:35px' type="submit" value="Save Changes">
+											</div>
+										</div>
+									</div>
+								<?php
+								$this->Form->end();
+								?>
+							</div>
+						</div>
+					</div>
+				</div>
+			<!-- List NS -->
+			<br>
+
+			
+			<!-- Modal -->
+			<div class="modal " id="modaledit" tabindex="-1" role="dialog" aria-labelledby="modaleditLabel" aria-hidden="true">
+			<div class="modal-dialog" role="document">
+				<div class="modal-content">
+				<div class="modal-header">
+					<h5 class="modal-title" id="modaleditLabel">Modify a NameServer IP</h5>
+					<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+					<span aria-hidden="true">&times;</span>
+					</button>
+				</div>
+				<?php
+				$this->Form->create();
+				?>
+					<div class="modal-body">
+						<!-- Modify Nameserver -->
+							<input type="hidden" name="action" value="update">
+							<div class="form-group">
+								<label style='font-size:18px'   class="col-xs-4 " for="inputModifyNs">Nameserver</label>
+								<div class="col-xs-5">
+									<div class="input-group">
+										<input class="form-control" type="text" style='height:35px' id="nameserver_edit" name="nameserver">
+										<div class="input-group-prepend">
+											<span class="input-group-text" style='height:35px'>.<?php echo $domain ?></span>
+										</div>
+									</div>
+								</div>
+							</div>
+							<div class="form-group">
+								<label style='font-size:18px'   class=" " for="inputModifyNewIp">New IP Address</label>
+
+								<div class="col-xs-5">
+									<input class="form-control" type="text" id="ip_edit" style='height:35px;width:100%' name="ipaddress">
+								</div>
+							</div>
+					</div>
+					<div class="modal-footer">
+						<button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+						<button type="submit" class="btn btn-primary">Save changes</button>
+					</div>
+
+				<?php
+				$this->Form->end();
+				?>
+				</div>
+			</div>
+			</div>
+		</div>
+	</div>
+</div>
+
+<div style="display:none">
+<?php
+$this->Form->create(null,["id" => "delete_form"]);
+?>
+	<input type="hidden" name="action" value="delete">
+	<input type="hidden" name="nameserver" id='nameserver_delete'>
+<?php
+$this->Form->end();
+?>
+</div>
+
+<script>
+$(".delete").click(function() {
+	$("#nameserver_delete").val($(this).attr('ns'))
+	$("#delete_form").submit()
+})
+
+$(".edit_ns").click(function() {
+	$("#nameserver_edit").val($(this).attr('ns'))
+	$("#ip_edit").val($(this).attr('ip'))
+	$("#modaledit").modal('show')
+
+	$(".modal-backdrop").remove()
+})
+</script>

@@ -1,0 +1,29 @@
+
+    <?php
+    $this->Form->create();
+    ?>
+    <div class="row panel-fix">
+        <div class="col-md-12">
+            <h4>Toggle ID Protection</h4>
+            <div class="form-group">
+                <div class="radio">
+                    <label>
+                        <input type="radio" name="registrar_lock" value="true" <?php echo $status ? 'checked' : '' ?> >
+                            Enable Id Protection                    
+                    </label>
+                </div>
+                <div class="radio">
+                    <label>
+                        <input type="radio" name="registrar_lock" value="false" <?php echo $status ? '' : 'checked' ?>>
+                            Disable Id Protection                    
+                    </label>
+                </div>
+            </div>
+        </div>
+    </div>
+    <button class="btn btn-default pull-right" type="submit">
+        <i class="fa fa-edit"></i> Submit
+    </button>
+    <?php
+    $this->Form->end();
+    ?>

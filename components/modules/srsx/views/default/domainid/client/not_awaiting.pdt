@@ -1,0 +1,6 @@
+
+<div class='container-fluid'>
+    <div class="alert alert-danger text-center">
+        domain not awaiting in document status
+    </div>
+</div>

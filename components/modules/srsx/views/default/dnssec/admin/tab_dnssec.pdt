@@ -1,0 +1,141 @@
+<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+<br>
+<style>
+ .table td, .table th, .table tr {
+    vertical-align: middle;
+}
+</style>
+
+
+<div class='container-fluid'>
+	<div class="tab-content margin-bottom">
+		<div class="tab-pane active" id="tabOverview">
+			<div class="alert alert-warning">
+				<p><strong>Warning! </strong>Make sure you understand using DNSSEC function, failure when creating record will make your domain cannot be accessed.</p>
+			</div>
+
+			<div class="dataTables_wrapper form-inline dt-bootstrap no-footer">
+				<div class="listtable">
+					<table class="table table-striped">
+						<thead class='thead-light'>
+							<tr>
+								<th class='text-center' scope='col' >Key Tag</th>
+								<th class='text-center' scope='col' >Algorithm</th>
+								<th class='text-center' scope='col' >Digest Type</th>
+								<th class='text-center' scope='col'>Digest</th>
+								<th class='text-right' scope='col' class='text-right'>Action</th>
+							</tr>
+						</thead>
+						<tbody>
+							<?php if($list) { ?>
+								<?php foreach($list as $l ) { ?>
+									<tr>
+										<td class="text-center"><?php echo $l->keytag?></td>
+										<td class="text-center"><?php echo $l->algorithm?></td>
+										<td class="text-center"><?php echo $l->digesttype?></td>
+										<td class="text-center"><?php echo $l->digest?></td>
+										<td class='text-right'>
+											<?php
+											$this->Form->create();
+											?>
+												<input style="height:30px;width:100%" type="hidden" name="action" value="delete">
+												<input style="height:30px;width:100%" type="hidden" name="id" value="<?php echo $l->id?>">
+												<button type="submit" class="btn btn-danger btn-sm">Delete</button>
+											<?php
+											$this->Form->end();
+											?>
+										</td>
+									</tr>
+								<?php } ?>
+							<?php } else { ?>
+								<tr>
+									<td colspan="5">no records found</td>
+								</tr>
+							<?php } ?>
+						</tbody>
+					</table>
+				</div>
+			</div>
+
+
+
+			<div class="card ">
+				<div class="card-header bg-secondary text-white" style='margin-left:-1px;margin-right:-1px;color:black;'>
+					Add record for <?php echo $domain ?>
+				</div>
+				<div class="card-body">
+					<?php
+					$this->Form->create(null,['style' => "margin-top:-25px"]);
+					?>
+						<br/>
+						<input style="height:30px;width:100%" type="hidden" name="action" value="add">
+						<div class="row">
+							<div class='col-md-6'>
+								<div class="form-group">
+									<label style='font-size:18px'   class=" col-xs-3">Key Tag</label>
+										<input style="height:30px;width:100%" class="form-control" id="keytag" name="keytag" type="text" placeholder="Should be an integer between 0 and 65535" required>
+								</div>
+								<div class="form-group">
+									<label style='font-size:18px'   class=" col-xs-3">Algorithm</label>
+									<div class="col-xs-6">
+										<select style="height:30px;width:100%" class="form-control" name="algorithm" id="algorithm">
+											<option value="1">RSA/MD5 (1)</option>
+											<option value="2">Diffie-Hellman (2)</option>
+											<option value="3">DSA-SHA1 (3)</option>
+											<option value="4">Elliptic Curve (ECC) (4)</option>
+											<option value="5">RSA-SHA1 (5)</option>
+											<option value="6">DSA-SHA1-NSEC3 (6)</option>
+											<option value="7">RSA-SHA1-NSEC3 (7)</option>
+											<option value="8">RSA-SHA256 (8)</option>
+											<option value="10">RSA-SHA512 (10)</option>
+											<option value="13">ECDSA Curve P-256 with SHA-256 (13)</option>
+											<option value="252">Indirect (252)</option>
+											<option value="253">Private [PRIVATEDNS] (253)</option>
+											<option value="254">Private [PRIVATEOID] (254)</option>
+										</select>
+									</div>
+								</div>
+							</div>
+							<div class='col-md-6'>
+								<div class="form-group">
+									<label style='font-size:18px'   class=" col-xs-3">Digest Type</label>
+									<div class="col-xs-6">
+										<select style="height:30px;width:100%" class="form-control" name="digesttype" id="digesttype">
+											<option value="1">1</option>
+											<option value="2">2</option>
+											<option value="3">3</option>
+										</select>
+									</div>
+								</div>
+								<div class="form-group">
+									<label style='font-size:18px'   class=" col-xs-3">Digest</label>
+										<input style="height:30px;width:100%" class="form-control" id="digest" name="digest" type="text" placeholder="Should be 40 or 64 characters long" required>
+								</div>
+							</div>
+						</div>
+
+						<div class="form-group">
+							<div class="col-xs-offset-3 col-xs-6">
+								<center>
+								<input style="" type="submit" class="btn btn-success btn-lg " value="Add Record">
+								</center>
+							</div>
+						</div>
+					<?php
+					$this->Form->end();
+					?>
+				</div>
+			</div>
+
+			<br/>
+		</div>
+	</div>
+</div>
+
+<style>
+	table {
+		table-layout: fixed;
+		width: 100%;
+		word-wrap: break-word;
+	}
+</style>

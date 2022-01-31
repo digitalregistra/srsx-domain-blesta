@@ -1,0 +1,32 @@
+    <style>
+        label {
+            font-size:15px
+        }
+    </style>
+    <div class="card mx-auto my-4" style='width:400px'>
+        <div class="card-header bg-secondary text-white" style='margin-left:-1px;margin-right:-1px;color:black;'>
+            Renew Domain
+        </div>
+        <div class="card-body">
+        <?php
+            $this->Form->create();
+        ?>
+            <div class="form-group">
+                <label for="exampleInputrenew1">Renew Period</label>
+                <select name="renew" style='height:30px' class="form-control" id="exampleInputrenew1" aria-describedby="renewHelp" placeholder="Enter renew">
+                    <?php for($i=1;$i<=10;$i++) { ?>
+                        <option value="<?php echo $i ?>"><?php echo $i ?> Tahun</option>
+                    <?php } ?>
+                </select>
+            </div>
+            <div class="form-group mt-2">
+                <button class=' btn btn-primary float-right'>Save</button>
+            </div>
+        </div>
+        <?php
+            $this->Form->end();
+        ?>
+    </div>
+
+    <script type="text/javascript">
+    </script>

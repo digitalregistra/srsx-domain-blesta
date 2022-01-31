@@ -1,0 +1,3 @@
+<div class="alert alert-danger text-center">
+    domain under status <?php echo $domainstatus ?>
+</div>

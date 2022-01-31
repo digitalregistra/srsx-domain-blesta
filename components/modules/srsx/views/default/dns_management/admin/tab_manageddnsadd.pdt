@@ -1,0 +1,231 @@
+<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+<br>
+<style>
+</style>
+<div class='container-fluid'>
+	<div class="tab-content margin-bottom">
+		<div class="tab-pane active" id="tabOverview">
+			
+			<div class="card ">
+				<div class="card-header bg-secondary text-white" style='margin-left:-1px;margin-right:-1px;color:black;'>
+					Add DNS Record for: <?php echo $domain ?>
+				</div>
+				<div class="card-body">
+					<?php
+					$this->Form->create();
+					?>
+						<br/>
+						<input style="height:35px;width:100%"  type="hidden" name="domain" value="{$domain}"/>
+						<input style="height:35px;width:100%"  type="hidden" name="domainid" value="{$domainid}"/>
+						
+						
+						<div class="row">
+								<div class='col-md-6'>
+									<div class="form-group">
+									<label style='font-size:18px' class=" col-xs-3">Domain</label>
+									<div class="col-xs-6">
+										<div style='height:35px' class="input-group">
+											
+											<input style="height:35px"  class="form-control" id="domainiddns_record"  name="record" type="text" >
+											<div style='height:35px' class="input-group-prepend">
+												<span style='height:35px' class="input-group-text">.<?php echo $domain ?></span>
+											</div>
+										</div>
+									</div>
+								</div>
+								<div class="form-group">
+									<label style='font-size:18px' class=" col-xs-3">TTL</label>
+									<div class="col-xs-6">
+										<input style="height:35px;width:100%"  class="form-control" id="domainiddns_ttl"  name="ttl" value="14400" type="text" >
+									</div>
+									<input style="height:35px;width:100%"  type="hidden" name="class" value="IN">
+								</div>
+								<div class="domainiddns_mx_record" style="display:none">
+									<div class="form-group">
+										<label style='font-size:18px' class=" col-xs-3">Priority</label>
+										<div class="col-xs-6">
+											<input style="height:35px;width:100%"  class="form-control" id="domainiddns_preference"  name="preference" type="text" >
+										</div>
+									</div>
+								</div>
+								<div class="domainiddns_srv_record" style="display:none">
+									<div class="form-group">
+										<label style='font-size:18px' class=" col-xs-3">Priority</label>
+										<div class="col-xs-6">
+											<input style="height:35px;width:100%"  class="form-control" id="domainiddns_priority"  name="priority" type="text" >
+										</div>
+									</div>
+								</div>
+							</div>
+							<div class='col-md-6'>
+							
+								<div class="form-group">
+									<label style='font-size:18px' class=" col-xs-3">Record Type</label>
+									<div class="col-xs-6">
+										<select class="form-control" name="type" id="domainiddns_type" onchange="domainiddns_changeType();">
+											<option value="select">Select</option>
+											<option value="A">A</option>
+											<option value="AAAA">AAAA</option>
+											<option value="CNAME">CNAME</option>
+											<option value="MX">MX</option>
+											<option value="NS">NS</option>
+											<option value="SRV">SRV</option>
+											<option value="TXT">TXT</option>
+										</select>
+									</div>
+								</div>
+								<!-- display:none -->
+								<!-- display:none -->
+								<div class="domainiddns_a_record" style="display:none">
+									<div class="form-group">
+										<label style='font-size:18px' class=" col-xs-3">IP or Hostname</label>
+										<div class="col-xs-6">
+											<input style="height:35px;width:100%"  class="form-control" id="domainiddns_address_a" name="address_a" type="text">
+										</div>
+									</div>
+								</div>
+								<div class="domainiddns_aaaa_record" style="display:none">
+									<div class="form-group">
+										<label style='font-size:18px' class=" col-xs-3">IPv6 Address</label>
+										<div class="col-xs-6">
+											<input style="height:35px;width:100%"  class="form-control" id="domainiddns_address_aaaa"  name="address_aaaa" type="text">
+										</div>
+									</div>
+								</div>
+								<div class="domainiddns_cname_record" style="display:none">
+									<div class="form-group">
+										<label style='font-size:18px' class=" col-xs-3">Hostname</label>
+										<div class="col-xs-6">
+											<input style="height:35px;width:100%"  class="form-control" id="domainiddns_cname" name="cname" type="text">
+										</div>
+									</div>
+								</div>
+								<div class="domainiddns_mx_record" style="display:none">
+									<div class="form-group">
+										<label style='font-size:18px' class=" col-xs-3">Hostname</label>
+										<div class="col-xs-6">
+											<input style="height:35px;width:100%"  class="form-control" id="domainiddns_exchange"  name="exchange" type="text" >
+										</div>
+									</div>
+								</div>
+								<div class="domainiddns_ns_record" style="display:none">
+									<div class="form-group">
+										<label style='font-size:18px' class=" col-xs-3">Hostname</label>
+										<div class="col-xs-6">
+											<input style="height:35px;width:100%"  class="form-control" id="domainiddns_nsdname"  name="nsdname" type="text" >
+										</div>
+									</div>
+								</div>
+								<div class="domainiddns_srv_record" style="display:none">
+									<div class="form-group">
+										<label style='font-size:18px' class=" col-xs-3">Weight</label>
+										<div class="col-xs-6">
+											<input style="height:35px;width:100%"  class="form-control" id="domainiddns_weight"  name="weight" type="text" >
+										</div>
+									</div>
+								</div>
+								<div class="domainiddns_srv_record" style="display:none">
+									<div class="form-group">
+										<label style='font-size:18px' class=" col-xs-3">Port</label>
+										<div class="col-xs-6">
+											<input style="height:35px;width:100%"  class="form-control" id="domainiddns_port"  name="port" type="text" >
+										</div>
+									</div>
+								</div>
+								<div class="domainiddns_srv_record" style="display:none">
+									<div class="form-group">
+										<label style='font-size:18px' class=" col-xs-3">Hostname</label>
+										<div class="col-xs-6">
+											<input style="height:35px;width:100%"  class="form-control" id="domainiddns_target"  name="target" type="text" >
+										</div>
+									</div>
+								</div>
+								<div class="domainiddns_txt_record" style="display:none">
+									<div class="form-group">
+										<label style='font-size:18px' class=" col-xs-3">Text Information</label>
+										<div class="col-xs-6">
+											<textarea class="form-control" id="domainiddns_txtdata" name="txtdata"></textarea>
+										</div>
+									</div>
+								</div>
+								<input style="height:35px;width:100%"  type="hidden" name="adddns" value="true">
+							</div>
+						</div>
+						<div class='row justify-content-center'>
+							<input style='height:35px'  type="hidden" name="dnsid" value="<?php echo $record->dnsid ?>">
+							<a href='?' role='button' class="btn btn-secondary mr-2" >
+								<i class='fa fa-angle-double-left'></i>
+								<?php $this->_('Srsx.tab_client_contact.clientareabacklink');?>
+							</a>
+							<input style='height:35px'  type="submit" value="Apply Modification" class="btn btn-success"/>
+							
+						</div>
+					<?php
+					$this->Form->end();
+					?>
+					
+				</div>
+			</div>
+
+			
+		</div>
+	</div>
+</div>
+
+<script>
+function domainiddns_changeType(){
+		var type = jQuery('#domainiddns_type').val();
+		if(type){
+			jQuery('#domainiddns_address_a').val('');
+			jQuery('#domainiddns_address_aaaa').val('');
+			jQuery('#domainiddns_cname').val('');
+			jQuery('#domainiddns_preference').val('');
+			jQuery('#domainiddns_exchange').val('');
+			jQuery('#domainiddns_nsdname').val('');
+			jQuery('#domainiddns_priority').val('');
+			jQuery('#domainiddns_weight').val('');
+			jQuery('#domainiddns_port').val('');
+			jQuery('#domainiddns_target').val('');
+			jQuery('#domainiddns_txtdata').val('');
+			if(type == 'A'){
+				// show
+				jQuery('.domainiddns_a_record').show();
+				// hide
+				jQuery('.domainiddns_aaaa_record').hide(); jQuery('.domainiddns_cname_record').hide(); jQuery('.domainiddns_mx_record').hide(); jQuery('.domainiddns_ns_record').hide(); jQuery('.domainiddns_srv_record').hide(); jQuery('.domainiddns_txt_record').hide();
+			}else if(type == 'AAAA'){
+				// show
+				jQuery('.domainiddns_aaaa_record').show();
+				// hide
+				jQuery('.domainiddns_a_record').hide(); jQuery('.domainiddns_cname_record').hide(); jQuery('.domainiddns_mx_record').hide(); jQuery('.domainiddns_ns_record').hide(); jQuery('.domainiddns_srv_record').hide(); jQuery('.domainiddns_txt_record').hide();
+			}else if(type == 'CNAME'){
+				// show
+				jQuery('.domainiddns_cname_record').show();
+				// hide
+				jQuery('.domainiddns_a_record').hide(); jQuery('.domainiddns_aaaa_record').hide(); jQuery('.domainiddns_mx_record').hide(); jQuery('.domainiddns_ns_record').hide(); jQuery('.domainiddns_srv_record').hide(); jQuery('.domainiddns_txt_record').hide();
+			}else if(type == 'MX'){
+				// show
+				jQuery('.domainiddns_mx_record').show();
+				// hide
+				jQuery('.domainiddns_a_record').hide(); jQuery('.domainiddns_aaaa_record').hide(); jQuery('.domainiddns_cname_record').hide(); jQuery('.domainiddns_ns_record').hide(); jQuery('.domainiddns_srv_record').hide(); jQuery('.domainiddns_txt_record').hide();
+			}else if(type == 'NS'){
+				// show
+				jQuery('.domainiddns_ns_record').show();
+				// hide
+				jQuery('.domainiddns_a_record').hide(); jQuery('.domainiddns_aaaa_record').hide(); jQuery('.domainiddns_cname_record').hide(); jQuery('.domainiddns_mx_record').hide(); jQuery('.domainiddns_srv_record').hide(); jQuery('.domainiddns_txt_record').hide();
+			}else if(type == 'SRV'){
+				// show
+				jQuery('.domainiddns_srv_record').show();
+				// hide
+				jQuery('.domainiddns_a_record').hide(); jQuery('.domainiddns_aaaa_record').hide(); jQuery('.domainiddns_cname_record').hide(); jQuery('.domainiddns_mx_record').hide(); jQuery('.domainiddns_ns_record').hide(); jQuery('.domainiddns_txt_record').hide();
+			}else if(type == 'TXT'){
+				// show
+				jQuery('.domainiddns_txt_record').show();
+				// hide
+				jQuery('.domainiddns_a_record').hide(); jQuery('.domainiddns_aaaa_record').hide(); jQuery('.domainiddns_cname_record').hide(); jQuery('.domainiddns_mx_record').hide(); jQuery('.domainiddns_ns_record').hide(); jQuery('.domainiddns_srv_record').hide();
+			}else if(type == 'select'){
+				// hide
+				jQuery('.domainiddns_a_record').hide(); jQuery('.domainiddns_aaaa_record').hide(); jQuery('.domainiddns_cname_record').hide(); jQuery('.domainiddns_mx_record').hide(); jQuery('.domainiddns_ns_record').hide(); jQuery('.domainiddns_srv_record').hide(); jQuery('.domainiddns_txt_record').hide();
+			}
+		}
+	}
+</script>

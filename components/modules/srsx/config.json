@@ -1,0 +1,28 @@
+{
+  "version": "5.0.0",
+  "type": "registrar",
+  "name": "Srsx.name",
+  "description": "Srsx.description",
+  "authors": [
+    {
+      "name": "PT. Digital Registra Indonesia",
+      "url": "http://www.digitalregistra.co.id"
+    }
+  ],
+  "package": {
+    "name_key": "domain-name"
+  },
+  "service": {
+    "name_key": "domain-name"
+  },
+  "module": {
+    "row": "Srsx.module_row",
+    "rows": "Srsx.module_row_plural",
+    "row_key": "registrar"
+  },
+  "email_tags": {
+    "module": [],
+    "package": [],
+    "service": ["domain-name"]
+  }
+}

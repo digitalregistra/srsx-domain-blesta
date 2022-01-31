@@ -1,0 +1,63 @@
+<div class="tab-content margin-bottom">
+	
+	<div id="tabs">
+		<ul class="nav nav-tabs">
+			<li class="nav-item" >
+				<a class="nav-link " href="?action=changecontact">
+					Change Contacts
+				</a>
+			</li>
+			<li class="nav-item">
+				<a class="nav-link" href="?action=modifycontact">
+					Modify Contact
+				</a>
+			</li>
+			<li class="nav-item active">
+				<a class="nav-link active" href="?action=deletecontact">
+					Delete Contact
+				</a>
+			</li>
+			<li class="nav-item">
+				<a class="nav-link" href="?action=createcontact">
+					Create Contact
+				</a>
+			</li>
+		</ul>
+	</div>
+
+	
+	<div class='container-fluid'>
+		<h3 class='mt-2'>Delete Contact</h3>
+		<p><?php $this->_('Srsx.tab_client_contact.deletecontact_desc');?></p>
+		<p><strong>Note:</strong> A Domain Contact cannot be deleted if it is asociated with one of your domains.</p>
+		<?php
+		$this->Form->create();
+		?>
+			<div class="form-group">
+				<label class="control-label ">Contact</label>
+				<div class="">
+					<select class="form-control" name="contactId" id="contactId">
+							<?php foreach($contact as $key => $c) { ?>
+									<option value="<?php echo $c->contactid ?>">#<?php echo $c->contactid ?> <?php echo $c->fname ?> <?php echo $c->lname ?> <?php echo $c->email ?></option>
+							<?php } ?>
+					</select>
+				</div>
+			</div>
+			<p class="text-center">
+				<input class="btn btn-danger" type="submit" value="Delete Selected Contact" onclick="return confirmDelete();"/>
+			</p>
+		<?php
+		$this->Form->end();
+		?>
+
+		<form method="get" action="?">
+			<p class="text-center">
+				<button class="btn" type="submit">
+					<i class='fa fa-angle-double-left'></i>
+					<?php $this->_('Srsx.tab_client_contact.clientareabacklink');?>
+				</button>
+			</p>
+		</form>
+	</div>
+
+</div>

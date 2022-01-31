@@ -1,0 +1,41 @@
+<div class="panel-pad">
+	<div class="row">
+		<div class="col-md-6 col-border service-info">
+			<label>Package</label>
+			<h4><?php echo $package->name ?></h4>
+			<label>Label</label>
+			<h4><?php echo $service->name ?></h4>
+			<label>Creation Date</label>
+			<h4><?php echo $created ?></h4>
+			<label>Billing Cycle</label>
+			<h4><?php echo "{$service->package_pricing->term} {$service->package_pricing->period}" ?></h4>
+		</div>
+		<div class="col-md-6 service-info">
+			<label>Status</label>
+			<h4>
+				<div class="badge 
+                    <?php
+                    if($service->status == 'active') {
+                        echo 'badge-success';
+                    } else if($service->status == 'suspended') {
+                        echo 'badge-danger';
+                    } else if($service->status == 'canceled') {
+                        echo 'badge-danger';
+                    } else {
+                        echo 'badge-warning';
+                    }
+                    ?>
+                ">
+                <?php echo $service->status ?>
+                </div>
+                
+			</h4>
+			<label>Renew Date</label>
+			<h4><?php echo $renews ?></h4>
+			<label>Next Invoice</label>
+			<h4><?php echo $inv_renew ?></h4>
+			<label>Recurring Amount</label>
+			<h4><?php echo $money ?></h4>
+		</div>
+	</div>
+</div>

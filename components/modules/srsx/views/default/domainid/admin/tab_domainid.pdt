@@ -1,0 +1,59 @@
+
+<div class="card mx-auto my-4" style="width:700px">
+<div class="card-header bg-secondary text-white" style='margin-left:-1px;margin-right:-1px;color:black;'>
+    Verifikasi Domain ID
+</div>
+<div class="card-body">
+    <div class="pad">
+        <?php if (isset($vars->domainStatus)): ?>
+        <div class="row">
+            <div class="col-md-6">
+                <p>
+                    <div class='mb-1 font-weight-bold'><?php $this->_("Srsx.tab_domainid.domain_status"); ?>:</div>
+                    <?php echo($vars->domainStatus); ?><br><br>
+                </p>
+                <strong><?php $this->_("Srsx.tab_domainid.document_status"); ?>:</strong>
+                <ul>
+                <?php foreach ($vars->requirement as $requirement): ?>
+                    &nbsp;-&nbsp;<?php echo($requirement->type); ?></strong> : <?php echo($requirement->status); ?><br>
+                <?php endforeach ?>
+                </ul>
+            </div>
+            <div class="col-md-6">
+                <p>
+                <div class='mb-1 font-weight-bold'><?php $this->_("Srsx.tab_domainid.document_upload"); ?>:</div>
+                <a href="<?php echo($vars->documentUrl); ?>" target="_blank" class="btn btn-success btn-sm mt-1"><?php $this->_("Srsx.tab_domainid.document_upload_button"); ?></a>
+            
+                </p>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-12">
+                <?php if (isset($vars->notification)): ?>    
+                <br>&nbsp;<br>
+                <strong><?php $this->_("Srsx.tab_domainid.notification"); ?>:</strong><br>
+                <?php foreach ($vars->notification as $notification): ?>
+                    <?php if ($notification->senderid == "user"): ?>
+                        <div style="padding:5px;color:black">
+                            <div style="border:1px solid #D8B15A;border-radius:5px;background:#efd99f;padding:10px">
+                                <?php echo($notification->date); ?>&nbsp;<b><?php echo($notification->sender); ?></b><br><?php echo($notification->notif); ?>
+                            </div>
+                        </div>
+                    <?php else: ?>
+                        <div style="padding:5px;color:black">
+                            <div style="border:1px solid #8ABBE6;border-radius:5px;background:#adcee8;padding:10px">
+                                <?php echo($notification->date); ?>&nbsp;<b><?php echo($notification->sender); ?></b><br><?php echo($notification->notif); ?>
+                            </div>
+                        </div>
+                    <?php endif ?>
+                <?php endforeach ?>
+                <div class="pull-right">
+                    <a class="btn btn-success btn-sm" href="<?php echo($vars->replyurl); ?>" target="_blank"><?php $this->_("Srsx.tab_domainid.notification_reply_button"); ?></a>&nbsp;&nbsp;
+                </div>
+                <?php endif ?>
+            </div>
+        </div>
+        <?php endif ?>
+    </div>
+</div>
+</div>

@@ -1,0 +1,5 @@
+<div class='container-fluid'>
+    <div class="alert alert-danger text-center">
+        anda tidak memiliki layanan id protection atau layanan id protection anda telah expired
+    </div>
+</div>
