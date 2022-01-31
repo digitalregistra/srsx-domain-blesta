@@ -61,6 +61,7 @@ class Srsx extends RegistrarModule
         # API configurations
         $row = $this->getModuleRow($package->module_row);
         $api = $this->getApi($row->meta->reseller_id, $row->meta->username, $row->meta->password, $row->meta->sandbox == 'true');
+
         # Input fields
         $input_fields = array();
         $domain_field_basics = array(
@@ -201,7 +202,7 @@ class Srsx extends RegistrarModule
             }
             # Check Order ID
             $productid = null;
-            $array = array(".ac.id", ".co.id", ".or.id", ".ponpes.id", ".sch.id", ".web.id");
+            $array = array(".ac.id", ".biz.id", ".co.id", ".or.id", ".ponpes.id", ".sch.id", ".web.id");
             if (($domainResult->response_json()->result->resultCode) == 1000) {
                 if (in_array($domainTld, $array) || (isset($vars["transfer"]) || isset($vars["epp-code"]))) {
                     $this->Input->setErrors(['error' => ['errors' => "domain berhasil diregistrasi namun statusnya masih tidak aktif.silahkan melengkapi dokumen jika belum dan mohon coba beberapa saat lagi"]]);
@@ -946,13 +947,22 @@ class Srsx extends RegistrarModule
 
     public function getAdminEditFields($package, $vars = null)
     {
+        // var_dump($vars);
         $module_fields = new ModuleFields();
+        // $idp = $module_fields->label("id_protection", "idp");
+        // Create qty field and attach to qty label
+        // $idp->attach($module_fields->fieldCheckbox("id_protection", "id_protection", (isset($vars->id_protection) && $vars->id_protection == "true"), array('id' => "idp"), $idp));
+        // $module_fields->setField($idp);
         return $module_fields;
     }
 
     public function getClientEditFields($package, $vars)
     {
         $module_fields = new ModuleFields();
+        // $idp = $module_fields->label("id_protection", "idp");
+        // Create qty field and attach to qty label
+        // $idp->attach($module_fields->fieldCheckbox("id_protection", "id_protection", (isset($vars->id_protection) && $vars->id_protection == "true"), array('id' => "idp"), $idp));
+        // $module_fields->setField($idp);
         return $module_fields;
 
     }
@@ -970,6 +980,8 @@ class Srsx extends RegistrarModule
     public function getAdminTabs($package, $service = null)
     {
         $data = array(
+            // 'tabDomainId' => Language::_('Srsx.tab_domainid.title',true),
+            // 'tabWhois' => Language::_('Srsx.tab_whois.title',true),
             'tabContact' => Language::_('Srsx.tab_whois.title', true),
             'tabNameservers' => Language::_('Srsx.tab_nameservers.title', true),
             'tabSettings' => Language::_('Srsx.tab_settings.title', true),
@@ -981,7 +993,34 @@ class Srsx extends RegistrarModule
             // 'tabDomainForwarding' => Language::_('Srsx.tabDomainForwarding.title',true),
             'tabRenew' => Language::_('Srsx.Renew.title', true),
         );
-       
+        // $uri_path = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
+        // $uri_segments = explode('/', $uri_path);
+        // $service = $this->Record->select()->from("service_fields")->where('service_id', "=", $uri_segments[5])->where('key', "=", 'domain-name')->fetch();
+        // if($service) {
+        //     $array = array(".ac.id",".biz.id",".co.id",".or.id",".ponpes.id",".sch.id",".web.id",);
+        //     foreach($array as $a) {
+        //         if(strpos($service->value, $a) !== false) {
+        //             $data['tabDomainId'] = Language::_('Srsx.tab_domainid.title',true);
+        //             break;
+        //         }
+        //     }
+
+        //     $row = $this->getModuleRow($package->module_row);
+        //     $service->name = $service->value;
+        //     $irtp = $this->irtp_client($row, $service);
+        //     $data['tabirtp'] =
+        //     "<script>
+        //     $(document).ready(function() {
+        //         before = $('form').filter(`:contains('Package Name')`).parent()
+        //         irtp = `{$irtp}`
+        //         before.html( irtp + before.html())
+        //         before = $('#service-add-ons')
+        //         irtp = `{$irtp}`
+        //         before.html( irtp + before.html())
+        //         $(`a[href*='tabirtp']`).parent().remove()
+        //     })
+        //     </script>";
+        // }
         return $data;
     }
 
@@ -1000,6 +1039,9 @@ class Srsx extends RegistrarModule
     public function getClientTabs($package, $service = null)
     {
         $data = array(
+            // 'tabClientInfo' => "Information",
+            // 'tabClientDomainId' => Language::_('Srsx.tab_domainid.title',true),
+            // 'tabClientWhois' => Language::_('Srsx.tab_whois.title',true),
             'tabClientContact' => Language::_('Srsx.tab_whois.title', true),
             'tabClientNameservers' => Language::_('Srsx.tab_nameservers.title', true),
             'tabClientSettings' => Language::_('Srsx.tab_settings.title', true),
@@ -1013,10 +1055,13 @@ class Srsx extends RegistrarModule
 
         $uri_path = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
         $uri_segments = explode('/', $uri_path);
+        // if($uri_segments[5] == '') {
+        //     header("Location: {$uri_path}tabClientInfo");
+        // }
         $service = $this->Record->select()->from("service_fields")->where('service_id', "=", $uri_segments[4])->where('key', "=", 'domain-name')->fetch();
 
         if ($service) {
-            $array = array(".ac.id", ".co.id", ".or.id", ".ponpes.id", ".sch.id", ".web.id");
+            $array = array(".ac.id", ".biz.id", ".co.id", ".or.id", ".ponpes.id", ".sch.id", ".web.id");
             foreach ($array as $a) {
                 if (strpos($service->value, $a) !== false) {
                     $data['tabClientDomainId'] = Language::_('Srsx.tab_domainid.title', true);
@@ -1152,12 +1197,220 @@ class Srsx extends RegistrarModule
     {
         return $this->manageDomainId('/domainid/client/tab_client_domainid', $package, $service, $get, $post, $files);
     }
+    //copas langsung dari app gagal
+    // public function manageClientInfo($view,$package,$service,$get,$post,$files)
+    // {
+
+    //     Loader::loadHelpers($this,['Coupons', 'ModuleManager', 'Packages', 'Clients', 'Services']);
+    //     // $this->uses(['Coupons', 'ModuleManager']);
+
+    //     // Ensure we have a service
+    //     // if (!($service = $this->Services->get((int)$this->get[0])) || $service->client_id != $this->client->id) {
+    //     //     $this->redirect($this->base_uri);
+    //     // }
+
+    //     // $package = $this->Packages->get($service->package->id);
+    //     $module = $this->ModuleManager->initModule($service->package->module_id);
+    //     $module->base_uri = $this->base_uri;
+
+    //     // Determine the plugin/method being managed
+    //     $method = null;
+    //     $plugin_id = null;
+    //     $tab_view = null;
+
+    //     // If the first GET argument is a number, we must infer this to mean a plugin, not a module
+    //     if (isset($this->get[1])) {
+    //         // Disallow clients from viewing module/plugin tabs if the service is not active
+    //         if ($service->status != 'active') {
+    //             $statuses = $this->Services->getStatusTypes();
+    //             $this->flashMessage(
+    //                 'error',
+    //                 Language::_('ClientServices.!error.tab_unavailable', true, $statuses[$service->status])
+    //             );
+    //             $this->redirect($this->base_uri . 'services/manage/' . $service->id);
+    //         }
+
+    //         // Process the selected module/plugin tab
+    //         if (is_numeric($this->get[1])) {
+    //             // No plugin method was given to call, or the plugin is not supported by the service
+    //             $valid_plugins = $this->Form->collapseObjectArray($package->plugins, 'plugin_id', 'plugin_id');
+    //             if (!isset($this->get[2]) || !array_key_exists($this->get[1], $valid_plugins)) {
+    //                 $this->redirect($this->base_uri . 'services/manage/' . $service->id . '/');
+    //             }
+
+    //             $plugin_id = $this->get[1];
+    //             $method = $this->get[2];
+
+    //             // Process and retrieve the plugin tab content
+    //             $tab_view = $this->processPluginTab($plugin_id, $method, $service);
+    //         } else {
+    //             $method = $this->get[1];
+
+    //             // Process and retrieve the module tab content
+    //             $tab_view = $this->processModuleTab($module, $method, $package, $service);
+    //         }
+    //     }
+
+    //     // Set sidebar tabs
+
+    //     // Set language for periods
+    //     $periods = $this->Packages->getPricingPeriods();
+    //     foreach ($this->Packages->getPricingPeriods(true) as $period => $lang) {
+    //         $periods[$period . '_plural'] = $lang;
+    //     }
+
+    //     // Set whether the client can cancel a service
+    //     // First check whether the service is already canceled
+    //     if (!$service->date_canceled
+    //         || (
+    //             $service->date_canceled
+    //             && strtotime($this->Date->cast($service->date_canceled, 'date_time')) > strtotime(date('c'))
+    //         )
+    //     ) {
+    //         // Service has not already been canceled, check whether the
+    //         // setting is enabled for clients to cancel services
+    //         $client_cancel_service = $this->client->settings['clients_cancel_services'] == 'true';
+    //     } else {
+    //         // Service is already canceled, can't cancel it again
+    //         $client_cancel_service = false;
+    //     }
+
+    //     // Set whether the client can change the service term
+    //     $client_change_service_term = isset($this->client->settings['client_change_service_term'])
+    //         && $this->client->settings['client_change_service_term'] == 'true';
+    //     $alternate_service_terms = [];
+    //     if ($client_change_service_term && isset($service->package_pricing->id)
+    //         && isset($service->package_pricing->period) && $service->package_pricing->period != 'onetime') {
+    //         $alternate_service_terms = $this->getPackageTerms($package, [$service->package_pricing->id]);
+    //     }
+
+    //     // Set whether the client can upgrade the service to another package in the same group
+    //     $client_change_service_package = isset($this->client->settings['client_change_service_package'])
+    //         && $this->client->settings['client_change_service_package'] == 'true';
+    //     if ($client_change_service_package) {
+    //         $upgradable_packages = $this->getUpgradablePackages(
+    //             $package,
+    //             ($service->parent_service_id ? 'addon' : 'standard')
+    //         );
+    //         $client_change_service_package = (!empty($upgradable_packages));
+    //     }
+
+    //     // Set whether the any config options are available to be added/updated
+    //     // $available_options = $this->getAvailableOptions($service);
+    //     $available_options = null;
+
+    //     // Determine whether a recurring coupon applies to this service
+    //     $recurring_coupon = false;
+    //     if ($service->coupon_id && $service->date_renews) {
+    //         $recurring_coupon = $this->Coupons->getRecurring(
+    //             $service->coupon_id,
+    //             $service->package_pricing->currency,
+    //             $service->date_renews . 'Z'
+    //         );
+    //     }
+
+    //     // Set the expected service renewal price
+    //     $service->renewal_price = $this->Services->getRenewalPrice($service->id);
+
+    //     // Display a notice regarding this service having queued service changes
+    //     // $queued_changes = $this->pendingServiceChanges($service->id);
+    //     $queued_changes = null;
+    //     if (!empty($queued_changes) && $this->queueServiceChanges()) {
+    //         $this->view->setMessage('notice', Language::_('ClientServices.!notice.queued_service_change', true));
+    //     }
+
+    //     // Set partial for the service information box
+    //     $service_params = [
+    //         'periods' => $periods,
+    //         'service' => $service,
+    //         'next_invoice_date' => $this->Services->getNextInvoiceDate($service->id),
+    //         'client_cancel_service' => $client_cancel_service,
+    //         'client_change_service_term' => $client_change_service_term,
+    //         'client_change_service_package' => $client_change_service_package,
+    //         'alternate_service_terms' => $alternate_service_terms,
+    //         'available_config_options' => (!empty($available_options)),
+    //         'recurring_coupon' => $recurring_coupon,
+    //         'queued_service_change' => !empty($queued_changes)
+    //     ];
+    //     Loader::loadHelpers($this,['Html', 'Form']);
+    //     $module_check = $module->getModule($package->module_row);
+    //     $this->view = new View("/information/client/client_services_service_infobox",'default');
+    //     $this->view->setDefaultView('components' . DS . 'modules' . DS . 'srsx' . DS);
+    //     foreach($service_params as $key => $s) {
+    //         $this->view->set($key,$s);
+    //     }
+    //     return $this->view->fetch();
+    //     if($module_check->name == 'SRS-X') {
+    //         //tampilan default
+    //         $this->view->set('service_infobox', $this->partial('client_services_service_infobox', $service_params));
+    //         //tampilan srs
+    //         // $srs = new Srsx();
+    //         // $irtp = $srs->irtp($module->getModuleRow($package->module_row), $service);
+    //         // $service_params = [
+    //         //     'periods' => $periods,
+    //         //     'service' => $service,
+    //         //     'next_invoice_date' => $this->Services->getNextInvoiceDate($service->id),
+    //         //     'client_cancel_service' => $client_cancel_service,
+    //         //     'client_change_service_term' => $client_change_service_term,
+    //         //     'client_change_service_package' => $client_change_service_package,
+    //         //     'alternate_service_terms' => $alternate_service_terms,
+    //         //     'available_config_options' => (!empty($available_options)),
+    //         //     'recurring_coupon' => $recurring_coupon,
+    //         //     'irtp_status' =>  $irtp->status,
+    //         //     'irtp_data' => $irtp->data,
+    //         //     'send_email_status' =>  $irtp->send_email_status,
+    //         //     'send_email' => $irtp->send_email,
+    //         //     'queued_service_change' => !empty($queued_changes)
+    //         // ];
+    //         // $this->view->set('service_infobox', $this->partial('client_services_service_irtp', $service_params));
+    //     } else {
+    //         $this->view->set('service_infobox', $this->partial('client_services_service_infobox', $service_params));
+    //     }
+
+    //     $this->view->set('service', $service);
+    //     $this->view->set('package', $package);
+
+    //     // Display a notice regarding the service being suspended/canceled
+    //     $error_notice = [];
+    //     if (!empty($service->date_suspended)) {
+    //         $error_notice[] = Language::_(
+    //             'ClientServices.manage.text_date_suspended',
+    //             true,
+    //             $this->Date->cast($service->date_suspended)
+    //         );
+    //     }
+    //     if (!empty($service->date_canceled)) {
+    //         $scheduled = false;
+    //         if ($this->Date->toTime($this->Date->cast($service->date_canceled))
+    //             > $this->Date->toTime($this->Date->cast(date('c')))
+    //         ) {
+    //             $scheduled = true;
+    //         }
+    //         $error_notice[] = Language::_(
+    //             'ClientServices.manage.text_date_' . ($scheduled ? 'to_cancel' : 'canceled'),
+    //             true,
+    //             $this->Date->cast($service->date_canceled)
+    //         );
+    //     }
+    //     if (!empty($error_notice)) {
+    //         $this->view->setMessage('error', ['notice' => $error_notice]);
+    //     }
+
+    //     if ($this->isAjax()) {
+    //         return $this->renderAjaxWidgetIfAsync(isset($this->get['whole_widget']) ? null : false);
+    //     }
+    // }
 
     public function manageClientInfo($view, $package, $service, $get, $post, $files)
     {
+        // var_dump($service);
+
         Loader::loadHelpers($this, ['Html', 'Form', 'currencies']);
         $day_inv = $this->Record->select()->from("company_settings")->where('company_id', "=", $package->company_id)->where('key', "=", 'inv_days_before_renewal')->fetch();
-        
+        // var_dump($day_inv);
+
+        // $currency = $this->Record->select()->from("currencies")->where('company_id', "=", $package->company_id)->where('code', "=", $service->package_pricing->currency)->fetch();
+        // var_dump($currency);
 
         $money = $this->Currencies->toCurrency(
             $service->package_pricing->price_renews,
@@ -2103,7 +2356,7 @@ class Srsx extends RegistrarModule
         # Is the TLD ".ID"?
         $show_content = false;
         $domainTld = $this->getTld($service->name);
-        if (in_array($domainTld, array(".ac.id", ".co.id", ".or.id", ".ponpes.id", ".sch.id", ".web.id"))) {
+        if (in_array($domainTld, array(".ac.id", ".biz.id", ".co.id", ".id", ".my.id", ".or.id", ".ponpes.id", ".sch.id", ".web.id"))) {
             $show_content = true;
         }
         # Domain status API
@@ -2147,7 +2400,7 @@ class Srsx extends RegistrarModule
             if ($row->meta->sandbox) {
                 $baseUrl = "http://srb{$row->meta->reseller_id}.srs-x.net";
             } else {
-                $baseUrl = "https://srb{$row->meta->reseller_id}.srs-x.com";
+                $baseUrl = "http://srb{$row->meta->reseller_id}.srs-x.com";
             }
         }
         $vars = $domainstatusResult->resultData;
@@ -2414,8 +2667,8 @@ class Srsx extends RegistrarModule
     public function is_valid_domain_name($domain_name)
     {
         return (preg_match("/^([a-z\d](-*[a-z\d])*)(\.([a-z\d](-*[a-z\d])*))*$/i", $domain_name) //valid chars check
-             && preg_match("/^.{1,253}$/", $domain_name) //overall length check
-             && preg_match("/^[^\.]{1,63}(\.[^\.]{1,63})*$/", $domain_name)); //length of each label
+            && preg_match("/^.{1,253}$/", $domain_name) //overall length check
+            && preg_match("/^[^\.]{1,63}(\.[^\.]{1,63})*$/", $domain_name)); //length of each label
     }
 
     private function getRowRules(&$vars)
@@ -2474,6 +2727,11 @@ class Srsx extends RegistrarModule
         if ($error = $response->errors_json()) {
             $this->Input->setErrors(['errors' => ['error' => $error]]);
         }
+    }
+
+    public function getTlds()
+    {
+        return Configure::get('Srsx.tlds');
     }
 
     private function getTld($domain, $top = false)
