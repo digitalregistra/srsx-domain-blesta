@@ -2729,7 +2729,7 @@ class Srsx extends RegistrarModule
         }
     }
 
-    public function getTlds()
+    public function getTlds($module_row_id = null)
     {
         return Configure::get('Srsx.tlds');
     }
