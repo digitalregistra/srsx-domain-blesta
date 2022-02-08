@@ -981,7 +981,7 @@ class Srsx extends RegistrarModule
             // 'tabDomainForwarding' => Language::_('Srsx.tabDomainForwarding.title',true),
             'tabRenew' => Language::_('Srsx.Renew.title', true),
         );
-       
+
         return $data;
     }
 
@@ -1157,7 +1157,6 @@ class Srsx extends RegistrarModule
     {
         Loader::loadHelpers($this, ['Html', 'Form', 'currencies']);
         $day_inv = $this->Record->select()->from("company_settings")->where('company_id', "=", $package->company_id)->where('key', "=", 'inv_days_before_renewal')->fetch();
-        
 
         $money = $this->Currencies->toCurrency(
             $service->package_pricing->price_renews,
@@ -2142,7 +2141,7 @@ class Srsx extends RegistrarModule
         # Set base URL
         if (preg_match("/a/", $row->meta->reseller_id)) {
             $resellerId = substr($row->meta->reseller_id, 0, -1);
-            $baseUrl = "http://srb{$resellerId}.alpha.srs-x.com";
+            $baseUrl = "https://srb{$resellerId}.alpha.srs-x.com";
         } else {
             if ($row->meta->sandbox) {
                 $baseUrl = "http://srb{$row->meta->reseller_id}.srs-x.net";
@@ -2474,6 +2473,11 @@ class Srsx extends RegistrarModule
         if ($error = $response->errors_json()) {
             $this->Input->setErrors(['errors' => ['error' => $error]]);
         }
+    }
+
+    public function getTlds($module_row_id = null)
+    {
+        return Configure::get('Srsx.tlds');
     }
 
     private function getTld($domain, $top = false)
