@@ -1007,8 +1007,8 @@ class Srsx extends RegistrarModule
             'tabClientEpp' => Language::_('Srsx.tab_epp.title', true),
             'tabClientChildNs' => Language::_('Srsx.tabClientChildNs.title', true),
             // 'tabClientDNSSEC' => Language::_('Srsx.tabClientDNSSEC.title',true),
-            // 'tabClientDNS' => Language::_('Srsx.tabClientDNS.title',true),
-            // 'tabClientDomainForwarding' => Language::_('Srsx.tabDomainForwarding.title',true),
+            'tabClientDNS' => Language::_('Srsx.tabClientDNS.title',true),
+            'tabClientDomainForwarding' => Language::_('Srsx.tabDomainForwarding.title',true),
         );
 
         $uri_path = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
@@ -1306,7 +1306,7 @@ class Srsx extends RegistrarModule
         $api = $this->getApi($row->meta->reseller_id, $row->meta->username, $row->meta->password, $row->meta->sandbox == 'true');
         $api->loadCommand('srsx_domain');
         $postfields["domain"] = $service->name;
-        $id = $_GET['id'];
+        // $id = $_GET['id'];
         $domainAPI = new SrsxDomain($api);
         if (isset($_POST) && $_SERVER['REQUEST_METHOD'] == 'POST') {
             if ($_POST['action'] == 'init') {
@@ -1430,12 +1430,10 @@ class Srsx extends RegistrarModule
                 return;
             }
         }
+
         # Load the helpers required for this view
         Loader::loadHelpers($this, ['Html', 'Form']);
         $this->view->set('domain', $service->name);
-        $this->view->set('list', $list);
-        $this->view->set('count', $count);
-        $this->view->set('init', $init);
         $this->view->setDefaultView('components' . DS . 'modules' . DS . 'srsx' . DS);
         //return $this->add_irtp_to_view_client($this->view->fetch(), $package, $service);
         return $this->view->fetch();
@@ -1443,8 +1441,6 @@ class Srsx extends RegistrarModule
 
     private function manage_DNS($view, $package, $service, $get, $post, $files)
     {
-
-        echo json_encode($service);die();
         $domainstatus = $this->domainstatus($view, $package, $service, $get, $post, $files);
         if ($domainstatus != 'active') {
             $uri_path = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
@@ -1493,9 +1489,23 @@ class Srsx extends RegistrarModule
                 $_POST['domain'] = $postfields["domain"];
                 $this->processResponseJson($domainAPI->dns_delete($_POST));
             } else if ($_POST['action'] == 'init') {
+                $init = false;
                 unset($_POST['action']);
                 $_POST['domain'] = $postfields["domain"];
                 $this->processResponseJson($domainAPI->dns_init($_POST));
+                $dns_info = $domainAPI->dns_info($postfields);
+                if ($dns_info->response_json()->result->resultCode == 1000) {
+                    $list = $dns_info->response_json()->resultData;
+                    foreach ($list as $key => $l) {
+                        if (strpos($key, 'dns') !== false) {
+                            $init = true;
+                        }
+                    }
+                }
+
+                if (!$init) {
+                    $this->processResponseJson($domainAPI->dns_init($_POST));
+                }
             } else if ($_POST['action'] == 'update') {
                 unset($_POST['action']);
                 $_POST['domain'] = $postfields["domain"];
@@ -1508,45 +1518,48 @@ class Srsx extends RegistrarModule
                 return;
             }
         }
-        $dns_info = $domainAPI->dns_info($postfields);
-        $list = $dns_info->response_json()->resultData;
-        $update = false;
-        if (
-            $list->reseller_ns1 != $list->domain_ns1 ||
-            $list->reseller_ns2 != $list->domain_ns2 ||
-            $list->reseller_ns3 != $list->domain_ns3 ||
-            $list->reseller_ns4 != $list->domain_ns4
-        ) {
-            $update = true;
-        }
-        // var_dump($list);
-        $init = false;
+
+        $update = $init = false;
         $count = 0;
-        foreach ($list as $key => $l) {
-            if (strpos($key, 'dns') !== false) {
-                $init = true;
-                if ($l->type != 'SOA') {
-                    $count++;
+        $dns_info = $domainAPI->dns_info($postfields);
+        if ($dns_info->response_json()->result->resultCode == 1000) {
+            $list = $dns_info->response_json()->resultData;
+
+            if (
+                $list->reseller_ns1 != $list->domain_ns1 ||
+                $list->reseller_ns2 != $list->domain_ns2 ||
+                $list->reseller_ns3 != $list->domain_ns3 ||
+                $list->reseller_ns4 != $list->domain_ns4
+            ) {
+                $update = true;
+            }
+    
+            foreach ($list as $key => $l) {
+                if (strpos($key, 'dns') !== false) {
+                    $init = true;
+                    if ($l->type != 'SOA') {
+                        $count++;
+                    } else {
+                        unset($list->$key);
+                    }
                 } else {
                     unset($list->$key);
                 }
-            } else {
-                unset($list->$key);
             }
         }
+
         $view = ($show_content ? $view : 'tab_unavailable');
         $this->view = new View($view, 'default');
         # Load the helpers required for this view
         Loader::loadHelpers($this, ['Html', 'Form']);
         $this->view->set('domain', $service->name);
-        $this->view->set('list', $list);
+        $this->view->set('list', $list ?? []);
         $this->view->set('count', $count);
         $this->view->set('init', $init);
         $this->view->set('update', $update);
         $this->view->setDefaultView('components' . DS . 'modules' . DS . 'srsx' . DS);
         //return $this->add_irtp_to_view_client($this->view->fetch(), $package, $service);
         return $this->view->fetch();
-
     }
 
     private function manage_DNSSEC($view, $package, $service, $get, $post, $files)
