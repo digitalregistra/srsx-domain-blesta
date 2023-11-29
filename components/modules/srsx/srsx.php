@@ -2493,6 +2493,83 @@ class Srsx extends RegistrarModule
         return Configure::get('Srsx.tlds');
     }
 
+    public function getTldPricing($module_row_id = null)
+    {
+        $row = $this->getModuleRow($module_row_id);
+        $api = $this->getApi($row->meta->reseller_id, $row->meta->username, $row->meta->password, $row->meta->sandbox == 'true');
+        $api->loadCommand("srsx_domain");
+        $domainAPI = new SrsxDomain($api);
+        $domainResult = $domainAPI->get_pricelist();
+        if ($domainResult->status() != 'OK') {
+            return false;
+        }
+
+        $response = $domainResult->response_json();
+        if ($response->result->resultCode != 1000) {
+            return false;
+        }
+
+        $tldPricings = [];
+        foreach ($response->resultData as $pricing) {
+            $tldPricings[$pricing->name] = [
+                'IDR' => [
+                    1 => [
+                        'register' => $pricing->register->{1},
+                        'transfer' => $pricing->transfer->{1},
+                        'renew' => $pricing->renew->{1},
+                    ],
+                    2 => [
+                        'register' => $pricing->register->{2},
+                        'transfer' => $pricing->transfer->{2},
+                        'renew' => $pricing->renew->{2},
+                    ],
+                    3 => [
+                        'register' => $pricing->register->{3},
+                        'transfer' => $pricing->transfer->{3},
+                        'renew' => $pricing->renew->{3},
+                    ],
+                    4 => [
+                        'register' => $pricing->register->{4},
+                        'transfer' => $pricing->transfer->{4},
+                        'renew' => $pricing->renew->{4},
+                    ],
+                    5 => [
+                        'register' => $pricing->register->{5},
+                        'transfer' => $pricing->transfer->{5},
+                        'renew' => $pricing->renew->{5},
+                    ],
+                    6 => [
+                        'register' => $pricing->register->{6},
+                        'transfer' => $pricing->transfer->{6},
+                        'renew' => $pricing->renew->{6},
+                    ],
+                    7 => [
+                        'register' => $pricing->register->{7},
+                        'transfer' => $pricing->transfer->{7},
+                        'renew' => $pricing->renew->{7},
+                    ],
+                    8 => [
+                        'register' => $pricing->register->{8},
+                        'transfer' => $pricing->transfer->{8},
+                        'renew' => $pricing->renew->{8},
+                    ],
+                    9 => [
+                        'register' => $pricing->register->{9},
+                        'transfer' => $pricing->transfer->{9},
+                        'renew' => $pricing->renew->{9},
+                    ],
+                    10 => [
+                        'register' => $pricing->register->{10},
+                        'transfer' => $pricing->transfer->{10},
+                        'renew' => $pricing->renew->{10},
+                    ],
+                ],
+            ];
+        }
+
+        return $tldPricings;
+    }
+
     private function getTld($domain, $top = false)
     {
         $tlds = Configure::get('Srsx.tlds');
