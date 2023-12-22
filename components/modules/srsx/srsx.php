@@ -164,7 +164,7 @@ class Srsx extends RegistrarModule
             $postfields["periode"] = 1;
             foreach ($package->pricing as $pricing) {
                 if ($pricing->id == $vars["pricing_id"]) {
-                    $vars["periode"] = $pricing->term;
+                    $postfields["periode"] = $pricing->term;
                     break;
                 }
             }
