@@ -2300,36 +2300,33 @@ class Srsx extends RegistrarModule
         $show_content = true;
         $tld = $this->getTld($fields->{'domain-name'});
         $sld = substr($fields->{'domain-name'}, 0, -strlen($tld));
-        if (property_exists($fields, 'order-id')) {
-            if (!empty($post)) {
-                $ns = [];
-                foreach ($post["ns"] as $i => $nameserver) {
-                    if ($nameserver != "") {
-                        $ns[] = $nameserver;
-                    }
-                }
-                $post['order-id'] = $fields->{'order-id'};
-                $postfields = [];
-                $postfields["domain"] = $service->name;
-                $postfields["nameserver"] = implode(",", $ns);
-                $domainupdatensResult = $domainAPI->updatens($postfields);
-                $this->processResponseJson($domainupdatensResult);
-                $vars = (object) $post;
-            } else {
-                $postfields = [];
-                $postfields["domain"] = $service->name;
-                $domaininfoResult = $domainAPI->info($postfields)->response_json();
-                $vars->ns = [];
-                for ($i = 0; $i < 5; $i++) {
-                    if (isset($domaininfoResult->resultData->{'ns' . ($i + 1)})) {
-                        $vars->ns[] = $domaininfoResult->resultData->{'ns' . ($i + 1)};
-                    }
+        
+        if (!empty($post)) {
+            $ns = [];
+            foreach ($post["ns"] as $i => $nameserver) {
+                if ($nameserver != "") {
+                    $ns[] = $nameserver;
                 }
             }
+            $post['order-id'] = $fields->{'order-id'};
+            $postfields = [];
+            $postfields["domain"] = $service->name;
+            $postfields["nameserver"] = implode(",", $ns);
+            $domainupdatensResult = $domainAPI->updatens($postfields);
+            $this->processResponseJson($domainupdatensResult);
+            $vars = (object) $post;
         } else {
-            # No order-id; info is not available
-            $show_content = false;
+            $postfields = [];
+            $postfields["domain"] = $service->name;
+            $domaininfoResult = $domainAPI->info($postfields)->response_json();
+            $vars->ns = [];
+            for ($i = 0; $i < 5; $i++) {
+                if (isset($domaininfoResult->resultData->{'ns' . ($i + 1)})) {
+                    $vars->ns[] = $domaininfoResult->resultData->{'ns' . ($i + 1)};
+                }
+            }
         }
+        
         $view = ($show_content ? $view : 'tab_unavailable');
         $this->view = new View($view, 'default');
         # Load the helpers required for this view
