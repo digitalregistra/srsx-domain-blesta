@@ -8,7 +8,7 @@
  * @copyright Copyright (c) 2019, PT. Digital Registra Indonesia
  */
 
-class Srsx extends RegistrarModule
+class Srsx extends Module
 {
 
     private $set_pending = false;
@@ -18,7 +18,7 @@ class Srsx extends RegistrarModule
         // Load configuration required by this module
         $this->loadConfig(dirname(__FILE__) . DS . 'config.json');
         # Load components required by this module
-        Loader::loadComponents($this, ['Input', "Record"]);
+        Loader::loadComponents($this, ['Input', 'Record']);
         # Load the language required by this module
         Language::loadLang('srsx', null, dirname(__FILE__) . DS . 'language' . DS);
         Configure::load('srsx', dirname(__FILE__) . DS . 'config' . DS);
@@ -47,17 +47,17 @@ class Srsx extends RegistrarModule
         $orderedService = isset($vars['service_id']) ? $vars['service_id'] : $vars['service_name'];
         $tblname = isset($vars['service_id']) ? 'service_id' : 'value';
         if (!isset($vars['domain-name'])) {
-            $servicefield = $this->Record->select()->from("service_fields")->where($tblname, "=", $orderedService)->where('key', "=", 'domain-name')->fetch();
+            $servicefield = $this->Record->select()->from('service_fields')->where($tblname, '=', $orderedService)->where('key', '=', 'domain-name')->fetch();
             $vars['domain-name'] = $servicefield->value;
         }
-        $servicefield = $this->Record->select()->from("service_fields")->where($tblname, "=", $orderedService)->where('key', "=", 'epp-code')->fetch();
+        $servicefield = $this->Record->select()->from('service_fields')->where($tblname, '=', $orderedService)->where('key', '=', 'epp-code')->fetch();
         if ($servicefield) {
             if ($servicefield->value) {
                 $vars['epp-code'] = $servicefield->value;
             }
 
         }
-        $service = json_decode(json_encode(['name' => $vars["domain-name"]]));
+        $service = json_decode(json_encode(['name' => $vars['domain-name']]));
         # API configurations
         $row = $this->getModuleRow($package->module_row);
         $api = $this->getApi($row->meta->reseller_id, $row->meta->username, $row->meta->password, $row->meta->sandbox == 'true');
@@ -73,52 +73,52 @@ class Srsx extends RegistrarModule
         # Package TLD
         $packageTld = $package->meta->tlds[0];
         # Cek apakah input domain menggunakan TLD apa tidak
-        $domainExplode = explode(".", $vars["domain-name"]);
+        $domainExplode = explode('.', $vars['domain-name']);
         if (count($domainExplode) == 1) {
-            $vars["domain-name"] = $vars["domain-name"] . $packageTld;
+            $vars['domain-name'] = $vars['domain-name'] . $packageTld;
         }
         unset($domainExplode[0]);
-        $extImplode = implode(".", $domainExplode);
+        $extImplode = implode('.', $domainExplode);
         # Cek apakah TLD domain sama dengan TLD package
         $packageTld = $package->meta->tlds[0];
         $domainTld = ".{$extImplode}";
         if (!in_array($domainTld, $package->meta->tlds)) {
-            $error = "Invalid domain TLD";
+            $error = 'Invalid domain TLD';
             $this->Input->setErrors(['errors' => ['error' => $error]]);
             return;
         }
         # Set all WHOIS info from client ($vars['client_id'])
         if (!isset($this->Clients)) {
-            Loader::loadModels($this, array("Clients"));
+            Loader::loadModels($this, array('Clients'));
         }
-        $client = $this->Clients->get($vars["client_id"]);
-        if (isset($vars["use_module"]) && $vars["use_module"] == "true") {
+        $client = $this->Clients->get($vars['client_id']);
+        if (isset($vars['use_module']) && $vars['use_module'] == 'true') {
             if (!isset($this->Contacts)) {
-                Loader::loadModels($this, array("Contacts"));
+                Loader::loadModels($this, array('Contacts'));
             }
             $contact_numbers = $this->Contacts->getNumbers($client->contact_id);
             $phonenumber = $this->formatPhone(isset($contact_numbers[0]) ? $contact_numbers[0]->number : null, $client->country);
-            $api->loadCommand("srsx_user");
+            $api->loadCommand('srsx_user');
             $userAPI = new SrsxUser($api);
             # Check user availability
             $postfields = [];
-            $postfields["user_username"] = $client->email;
+            $postfields['user_username'] = $client->email;
             $userinfoResult = $userAPI->info($postfields);
             if (($userinfoResult->response_json()->result->resultCode) != 1000) {
                 # Create new user
                 $postfields = [];
-                $postfields["user_username"] = $client->email;
-                $postfields["user_password"] = $this->randomhash(10);
-                $postfields["fname"] = $client->first_name;
-                $postfields["lname"] = $client->last_name;
-                $postfields["company"] = $client->company;
-                $postfields["address"] = $client->address1;
-                $postfields["address2"] = $client->address2;
-                $postfields["city"] = $client->city;
-                $postfields["province"] = $client->state;
-                $postfields["country"] = $client->country;
-                $postfields["postal_code"] = $client->zip;
-                $postfields["phone"] = $phonenumber;
+                $postfields['user_username'] = $client->email;
+                $postfields['user_password'] = $this->randomhash(10);
+                $postfields['fname'] = $client->first_name;
+                $postfields['lname'] = $client->last_name;
+                $postfields['company'] = $client->company;
+                $postfields['address'] = $client->address1;
+                $postfields['address2'] = $client->address2;
+                $postfields['city'] = $client->city;
+                $postfields['province'] = $client->state;
+                $postfields['country'] = $client->country;
+                $postfields['postal_code'] = $client->zip;
+                $postfields['phone'] = $phonenumber;
                 $usercreateResult = $userAPI->create($postfields);
                 $this->processResponseJson($usercreateResult);
                 if ($this->Input->errors()) {
@@ -126,12 +126,12 @@ class Srsx extends RegistrarModule
                 }
             }
             # Load command
-            $api->loadCommand("srsx_domain");
+            $api->loadCommand('srsx_domain');
             $domainAPI = new SrsxDomain($api);
             # Register / transfer
             $postfields = [];
-            $postfields["domain"] = $vars["domain-name"];
-            $postfields["api_id"] = $vars["domain-name"];
+            $postfields['domain'] = $vars['domain-name'];
+            $postfields['api_id'] = $vars['domain-name'];
 
             $domainResult = $domainAPI->info($postfields);
             if ($domainResult->status_json() == 'OK') {
@@ -140,71 +140,71 @@ class Srsx extends RegistrarModule
                     $productid = ($domainResult->response_json()->resultData->productid);
                     return array(
                         array(
-                            "key" => "domain-name",
-                            "value" => $vars["domain-name"],
-                            "encrypted" => 0,
+                            'key' => 'domain-name',
+                            'value' => $vars['domain-name'],
+                            'encrypted' => 0,
                         ),
                         array(
-                            "key" => "order-id",
-                            "value" => $productid,
-                            "encrypted" => 0,
+                            'key' => 'order-id',
+                            'value' => $productid,
+                            'encrypted' => 0,
                         ),
                     );
                 } else {
-                    $this->Input->setErrors(['error' => ['errors' => "domain berhasil diregistrasi namun statusnya masih tidak aktif.silahkan melengkapi dokumen jika belum dan mohon coba beberapa saat lagi"]]);
+                    $this->Input->setErrors(['error' => ['errors' => 'domain berhasil diregistrasi namun statusnya masih tidak aktif.silahkan melengkapi dokumen jika belum dan mohon coba beberapa saat lagi']]);
                     return;
                 }
             }
 
             for ($i = 1; $i <= 4; $i++) {
-                if (isset($vars["ns{$i}"]) && $vars["ns{$i}"] != "") {
+                if (isset($vars["ns{$i}"]) && $vars["ns{$i}"] != '') {
                     $postfields["ns{$i}"] = $vars["ns{$i}"];
                 }
             }
-            $postfields["periode"] = 1;
+            $postfields['periode'] = 1;
             foreach ($package->pricing as $pricing) {
-                if ($pricing->id == $vars["pricing_id"]) {
-                    $postfields["periode"] = $pricing->term;
+                if ($pricing->id == $vars['pricing_id']) {
+                    $postfields['periode'] = $pricing->term;
                     break;
                 }
             }
-            $postfields["fname"] = $client->first_name;
-            $postfields["lname"] = $client->last_name;
-            $postfields["company"] = $client->company;
-            $postfields["address1"] = $client->address1;
-            $postfields["address2"] = $client->address2;
-            $postfields["city"] = $client->city;
-            $postfields["state"] = $client->state;
-            $postfields["country"] = $client->country;
-            $postfields["postcode"] = $client->zip;
-            $postfields["phonenumber"] = $phonenumber;
-            $postfields["handphone"] = $phonenumber;
-            $postfields["email"] = $client->email;
-            $postfields["user_username"] = $client->email;
-            $postfields["user_fname"] = $client->first_name;
-            $postfields["user_lname"] = $client->last_name;
-            $postfields["user_email"] = $client->email;
-            $postfields["user_company"] = $client->company;
-            $postfields["user_address"] = $client->address1;
-            $postfields["user_address2"] = $client->address2;
-            $postfields["user_city"] = $client->city;
-            $postfields["user_province"] = $client->state;
-            $postfields["user_country"] = $client->country;
-            $postfields["user_postal_code"] = $client->zip;
-            $postfields["user_phone"] = $phonenumber;
-            if (isset($vars["transfer"]) || isset($vars["epp-code"])) {
-                $postfields["transfersecret"] = ($vars["epp-code"]);
+            $postfields['fname'] = $client->first_name;
+            $postfields['lname'] = $client->last_name;
+            $postfields['company'] = $client->company;
+            $postfields['address1'] = $client->address1;
+            $postfields['address2'] = $client->address2;
+            $postfields['city'] = $client->city;
+            $postfields['state'] = $client->state;
+            $postfields['country'] = $client->country;
+            $postfields['postcode'] = $client->zip;
+            $postfields['phonenumber'] = $phonenumber;
+            $postfields['handphone'] = $phonenumber;
+            $postfields['email'] = $client->email;
+            $postfields['user_username'] = $client->email;
+            $postfields['user_fname'] = $client->first_name;
+            $postfields['user_lname'] = $client->last_name;
+            $postfields['user_email'] = $client->email;
+            $postfields['user_company'] = $client->company;
+            $postfields['user_address'] = $client->address1;
+            $postfields['user_address2'] = $client->address2;
+            $postfields['user_city'] = $client->city;
+            $postfields['user_province'] = $client->state;
+            $postfields['user_country'] = $client->country;
+            $postfields['user_postal_code'] = $client->zip;
+            $postfields['user_phone'] = $phonenumber;
+            if (isset($vars['transfer']) || isset($vars['epp-code'])) {
+                $postfields['transfersecret'] = ($vars['epp-code']);
                 $domainResult = $domainAPI->transfer($postfields);
             } else {
-                $postfields["randomhash"] = $this->randomhash(64);
+                $postfields['randomhash'] = $this->randomhash(64);
                 $domainResult = $domainAPI->register($postfields);
             }
             # Check Order ID
             $productid = null;
-            $array = array(".ac.id", ".co.id", ".or.id", ".ponpes.id", ".sch.id", ".web.id");
+            $array = array('.ac.id', '.co.id', '.or.id', '.ponpes.id', '.sch.id', '.web.id');
             if (($domainResult->response_json()->result->resultCode) == 1000) {
-                if (in_array($domainTld, $array) || (isset($vars["transfer"]) || isset($vars["epp-code"]))) {
-                    $this->Input->setErrors(['error' => ['errors' => "domain berhasil diregistrasi namun statusnya masih tidak aktif.silahkan melengkapi dokumen jika belum dan mohon coba beberapa saat lagi"]]);
+                if (in_array($domainTld, $array) || (isset($vars['transfer']) || isset($vars['epp-code']))) {
+                    $this->Input->setErrors(['error' => ['errors' => 'domain berhasil diregistrasi namun statusnya masih tidak aktif.silahkan melengkapi dokumen jika belum dan mohon coba beberapa saat lagi']]);
                     return;
                 }
                 if (isset($domainResult->response_json()->resultData->productid)) {
@@ -212,8 +212,8 @@ class Srsx extends RegistrarModule
                 }
             } else {
 
-                if (in_array($domainTld, $array) || (isset($vars["transfer"]) || isset($vars["epp-code"]))) {
-                    $this->Input->setErrors(['error' => ['errors' => "domain berhasil diregistrasi namun statusnya masih tidak aktif.silahkan melengkapi dokumen jika belum dan mohon coba beberapa saat lagi"]]);
+                if (in_array($domainTld, $array) || (isset($vars['transfer']) || isset($vars['epp-code']))) {
+                    $this->Input->setErrors(['error' => ['errors' => 'domain berhasil diregistrasi namun statusnya masih tidak aktif.silahkan melengkapi dokumen jika belum dan mohon coba beberapa saat lagi']]);
                     return;
                 }
             }
@@ -245,14 +245,14 @@ class Srsx extends RegistrarModule
             // }
             return array(
                 array(
-                    "key" => "domain-name",
-                    "value" => $vars["domain-name"],
-                    "encrypted" => 0,
+                    'key' => 'domain-name',
+                    'value' => $vars['domain-name'],
+                    'encrypted' => 0,
                 ),
                 array(
-                    "key" => "order-id",
-                    "value" => $productid,
-                    "encrypted" => 0,
+                    'key' => 'order-id',
+                    'value' => $productid,
+                    'encrypted' => 0,
                 ),
                 // array(
                 //     "key" => $custom_fields['id_protection']['key'],
@@ -260,13 +260,13 @@ class Srsx extends RegistrarModule
                 //     "encrypted" => $custom_fields['id_protection']['encrypted']
                 // )
             );
-        } elseif ($status == "active") {
+        } elseif ($status == 'active') {
             # Change product status with skipping activation process, with same client and pruduct
-            $api->loadCommand("srsx_user");
+            $api->loadCommand('srsx_user');
             $userAPI = new SrsxUser($api);
             # Check user availability
             $postfields = [];
-            $postfields["user_username"] = $client->email;
+            $postfields['user_username'] = $client->email;
             $userinfoResult = $userAPI->info($postfields);
             $this->processResponseJson($userinfoResult);
             if ($this->Input->errors()) {
@@ -274,14 +274,14 @@ class Srsx extends RegistrarModule
             }
             $useridUser = ($userinfoResult->response_json()->resultData->userid);
             # Check domain information
-            $api->loadCommand("srsx_domain");
+            $api->loadCommand('srsx_domain');
             $domainAPI = new SrsxDomain($api);
             $postfields = [];
-            $postfields["domain"] = $vars["domain-name"];
+            $postfields['domain'] = $vars['domain-name'];
             $domaininfoResult = $domainAPI->info($postfields);
             $this->processResponseJson($domaininfoResult);
             if (($domaininfoResult->response_json()->result->resultCode) == 2400) {
-                $errorMsg = "There are no order for this domain";
+                $errorMsg = 'There are no order for this domain';
                 $this->Input->setErrors(['errors' => $errorMsg]);
                 return;
             }
@@ -289,7 +289,7 @@ class Srsx extends RegistrarModule
             $useridDomain = ($domaininfoResult->response_json()->resultData->userid);
             # Are both userids same?
             if ($useridUser != $useridDomain) {
-                $errorMsg = "Invalid user for this domain";
+                $errorMsg = 'Invalid user for this domain';
                 $this->Input->setErrors(['errors' => $errorMsg]);
                 return;
             }
@@ -310,14 +310,14 @@ class Srsx extends RegistrarModule
             // }
             return array(
                 array(
-                    "key" => "domain-name",
-                    "value" => $vars["domain-name"],
-                    "encrypted" => 0,
+                    'key' => 'domain-name',
+                    'value' => $vars['domain-name'],
+                    'encrypted' => 0,
                 ),
                 array(
-                    "key" => "order-id",
-                    "value" => $productid,
-                    "encrypted" => 0,
+                    'key' => 'order-id',
+                    'value' => $productid,
+                    'encrypted' => 0,
                 ),
                 // array(
                 //     "key" => $custom_fields['id_protection']['key'],
@@ -329,7 +329,7 @@ class Srsx extends RegistrarModule
         $meta = array();
         $fields = array_intersect_key(
             $vars,
-            array_merge(array("ns1" => true, "ns2" => true, "ns3" => true, "ns4" => true), $input_fields)
+            array_merge(array('ns1' => true, 'ns2' => true, 'ns3' => true, 'ns4' => true), $input_fields)
         );
 
         // if(isset($vars['id_protection'])) {
@@ -343,9 +343,9 @@ class Srsx extends RegistrarModule
         // }
         foreach ($fields as $key => $value) {
             $meta[] = array(
-                "key" => $key,
-                "value" => $value,
-                "encrypted" => 0,
+                'key' => $key,
+                'value' => $value,
+                'encrypted' => 0,
             );
         }
         // $idp = $this->idp($status_idp, $row, $service);
@@ -358,7 +358,6 @@ class Srsx extends RegistrarModule
 
     public function getExpirationDate($service, $format = 'Y-m-d H:i:s')
     {
-
         Loader::loadHelpers($this, ['Date']);
 
         $domain = $this->getServiceDomain($service);
@@ -370,7 +369,7 @@ class Srsx extends RegistrarModule
         $domainAPI = new SrsxDomain($api);
         # Domain cancel
         $postfields = [];
-        $postfields["domain"] = $domain;
+        $postfields['domain'] = $domain;
         $domainResult = $domainAPI->info($postfields);
         $this->processResponseJson($domainResult);
         if ($this->Input->errors()) {
@@ -382,9 +381,9 @@ class Srsx extends RegistrarModule
             $status = $result->status;
         }
         // if($service->status != 'cancelled')
-        $this->Record->where("id", "=", $service->id)->update("services", array("status" => $status));
+        $this->Record->where('id', '=', $service->id)->update('services', array('status' => $status));
         if (isset($domainResult->response_json()->resultData->unixenddate)) {
-            return $domainResult->response_json()->resultData->unixenddate;
+            return date($format, $domainResult->response_json()->resultData->unixenddate);
         }
         return null;
     }
@@ -399,7 +398,7 @@ class Srsx extends RegistrarModule
             $api->loadCommand('srsx_domain');
             $domainAPI = new SrsxDomain($api);
             $postfields = [];
-            $postfields["domain"] = $service->name;
+            $postfields['domain'] = $service->name;
             $response = $domainAPI->info($postfields);
             $this->processResponseJson($response);
             if ($this->Input->errors()) {
@@ -477,7 +476,7 @@ class Srsx extends RegistrarModule
         $domainAPI = new SrsxDomain($api);
         # Domain cancel
         $postfields = [];
-        $postfields["domain"] = $service->name;
+        $postfields['domain'] = $service->name;
         $domaincancelResult = $domainAPI->cancel($postfields);
         $this->processResponseJson($domaincancelResult);
         return null;
@@ -493,7 +492,7 @@ class Srsx extends RegistrarModule
         $domainAPI = new SrsxDomain($api);
         # Domain suspend
         $postfields = [];
-        $postfields["domain"] = $service->name;
+        $postfields['domain'] = $service->name;
         $domainsuspendResult = $domainAPI->suspend($postfields);
         $this->processResponseJson($domainsuspendResult);
         return null;
@@ -509,7 +508,7 @@ class Srsx extends RegistrarModule
         $domainAPI = new SrsxDomain($api);
         # Domain unsuspend
         $postfields = [];
-        $postfields["domain"] = $service->name;
+        $postfields['domain'] = $service->name;
         $domainunsuspendResult = $domainAPI->unsuspend($postfields);
         $this->processResponseJson($domainunsuspendResult);
         return null;
@@ -525,11 +524,11 @@ class Srsx extends RegistrarModule
         $domainAPI = new SrsxDomain($api);
         # Domain renew
         $postfields = [];
-        $postfields["domain"] = $service->name;
-        $postfields["periode"] = 1;
+        $postfields['domain'] = $service->name;
+        $postfields['periode'] = 1;
         foreach ($package->pricing as $pricing) {
             if ($pricing->id == $service->pricing_id) {
-                $postfields["periode"] = $pricing->term;
+                $postfields['periode'] = $pricing->term;
                 break;
             }
         }
@@ -714,7 +713,7 @@ class Srsx extends RegistrarModule
                 $fields->fieldText(
                     'meta[ns][]',
                     $this->Html->ifSet($vars->meta['ns'][$i - 1]),
-                    array("id" => "srsx_ns{$i}")
+                    array('id' => "srsx_ns{$i}")
                 )
             );
             $fields->setField($type);
@@ -726,15 +725,15 @@ class Srsx extends RegistrarModule
     {
         $api = $this->getApi($row->meta->reseller_id, $row->meta->username, $row->meta->password, $row->meta->sandbox == 'true');
         $api->loadCommand('srsx_domain');
-        $postfields["domain"] = $service->name;
-        $postfields["api_id"] = $service->name;
+        $postfields['domain'] = $service->name;
+        $postfields['api_id'] = $service->name;
         $domainAPI = new SrsxDomain($api);
         if ($status) {
-            $postfields["idprotection"] = 1;
+            $postfields['idprotection'] = 1;
             $this->processResponseJson($domainAPI->set_idprotection($postfields));
             return true;
         } else {
-            $postfields["idprotection"] = 0;
+            $postfields['idprotection'] = 0;
             $this->processResponseJson($domainAPI->set_idprotection($postfields));
             return true;
         }
@@ -825,7 +824,7 @@ class Srsx extends RegistrarModule
             $fields['domain-name']['type'] = 'hidden';
             $fields['domain-name']['label'] = null;
             $module_fields = $this->arrayToModuleFields($fields, null, $vars);
-            $extension_fields = Configure::get("Srsx.contact_fields");
+            $extension_fields = Configure::get('Srsx.contact_fields');
             if ($extension_fields) {
                 $module_fields = $this->arrayToModuleFields($extension_fields, $module_fields, $vars);
             }
@@ -1007,16 +1006,16 @@ class Srsx extends RegistrarModule
             'tabClientEpp' => Language::_('Srsx.tab_epp.title', true),
             'tabClientChildNs' => Language::_('Srsx.tabClientChildNs.title', true),
             // 'tabClientDNSSEC' => Language::_('Srsx.tabClientDNSSEC.title',true),
-            'tabClientDNS' => Language::_('Srsx.tabClientDNS.title',true),
-            'tabClientDomainForwarding' => Language::_('Srsx.tabDomainForwarding.title',true),
+            'tabClientDNS' => Language::_('Srsx.tabClientDNS.title', true),
+            'tabClientDomainForwarding' => Language::_('Srsx.tabDomainForwarding.title', true),
         );
 
         $uri_path = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
         $uri_segments = explode('/', $uri_path);
-        $service = $this->Record->select()->from("service_fields")->where('service_id', "=", $uri_segments[4])->where('key', "=", 'domain-name')->fetch();
+        $service = $this->Record->select()->from('service_fields')->where('service_id', '=', $uri_segments[4])->where('key', '=', 'domain-name')->fetch();
 
         if ($service) {
-            $array = array(".ac.id", ".co.id", ".or.id", ".ponpes.id", ".sch.id", ".web.id");
+            $array = array('.ac.id', '.co.id', '.or.id', '.ponpes.id', '.sch.id', '.web.id');
             foreach ($array as $a) {
                 if (strpos($service->value, $a) !== false) {
                     $data['tabClientDomainId'] = Language::_('Srsx.tab_domainid.title', true);
@@ -1156,7 +1155,7 @@ class Srsx extends RegistrarModule
     public function manageClientInfo($view, $package, $service, $get, $post, $files)
     {
         Loader::loadHelpers($this, ['Html', 'Form', 'currencies']);
-        $day_inv = $this->Record->select()->from("company_settings")->where('company_id', "=", $package->company_id)->where('key', "=", 'inv_days_before_renewal')->fetch();
+        $day_inv = $this->Record->select()->from('company_settings')->where('company_id', '=', $package->company_id)->where('key', '=', 'inv_days_before_renewal')->fetch();
 
         $money = $this->Currencies->toCurrency(
             $service->package_pricing->price_renews,
@@ -1172,22 +1171,22 @@ class Srsx extends RegistrarModule
         $domainAPI = new SrsxDomain($api);
         # Domain cancel
         $postfields = [];
-        $postfields["domain"] = $domain;
-        $postfields["api_id"] = $domain;
+        $postfields['domain'] = $domain;
+        $postfields['api_id'] = $domain;
         $domainResult = $domainAPI->status($postfields);
 
         $this->processResponseJson($domainResult);
         if (isset($domainResult->response_json()->resultData->domainstatus)) {
             $service->status = $domainResult->response_json()->resultData->domainstatus;
         }
-        $timezone = $this->Record->select()->from("company_settings")->where('company_id', "=", $package->company_id)->where('key', "=", "timezone")->fetch();
+        $timezone = $this->Record->select()->from('company_settings')->where('company_id', '=', $package->company_id)->where('key', '=', 'timezone')->fetch();
 
-        $created = new DateTime($service->date_added, new DateTimeZone("Africa/Abidjan")); //utc 0 didatabase
+        $created = new DateTime($service->date_added, new DateTimeZone('Africa/Abidjan')); //utc 0 didatabase
         // echo $service->date_renews;
         $created->setTimezone(new DateTimeZone($timezone->value));
-        $renews = new DateTime($service->date_renews, new DateTimeZone("Africa/Abidjan")); //utc 0 didatabase
+        $renews = new DateTime($service->date_renews, new DateTimeZone('Africa/Abidjan')); //utc 0 didatabase
         $renews->setTimezone(new DateTimeZone($timezone->value));
-        $inv_renew = new DateTime($service->date_renews, new DateTimeZone("Africa/Abidjan")); //utc 0 didatabase
+        $inv_renew = new DateTime($service->date_renews, new DateTimeZone('Africa/Abidjan')); //utc 0 didatabase
         $inv_renew->setTimezone(new DateTimeZone($timezone->value));
         $inv_renew->modify("-{$day_inv->value} day");
 
@@ -1196,9 +1195,9 @@ class Srsx extends RegistrarModule
         $this->view->set('package', $package);
         $this->view->set('service', $service);
         $this->view->set('day_inv', $day_inv);
-        $this->view->set('renews', $renews->format("M d, Y"));
-        $this->view->set('created', $created->format("M d, Y"));
-        $this->view->set('inv_renew', $inv_renew->format("M d, Y"));
+        $this->view->set('renews', $renews->format('M d, Y'));
+        $this->view->set('created', $created->format('M d, Y'));
+        $this->view->set('inv_renew', $inv_renew->format('M d, Y'));
         $this->view->set('money', $money);
         // echo date("M d, Y",strtotime($service->date_renews));
         //return $this->add_irtp_to_view_client($this->view->fetch(), $package, $service);
@@ -1208,7 +1207,7 @@ class Srsx extends RegistrarModule
     public function remove_client_default_link($service)
     {
         Loader::loadHelpers($this, ['Html', 'Form']);
-        $this->view = new View("/irtp/client/remove_default_link", 'default');
+        $this->view = new View('/irtp/client/remove_default_link', 'default');
         $this->view->set('service', $service);
         $this->view->setDefaultView('components' . DS . 'modules' . DS . 'srsx' . DS);
         // $this->irtp_client($row, $service);
@@ -1226,7 +1225,7 @@ class Srsx extends RegistrarModule
         $domainstatus = $this->domainstatus($view, $package, $service, $get, $post, $files);
         if ($domainstatus != 'active') {
             $uri_path = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
-            if (strpos($uri_path, "admin/clients")) {
+            if (strpos($uri_path, 'admin/clients')) {
                 $view = 'domain_not_active/admin/index';
             } else {
                 $view = 'domain_not_active/client/index';
@@ -1242,9 +1241,9 @@ class Srsx extends RegistrarModule
             $row = $this->getModuleRow($package->module_row);
             $api = $this->getApi($row->meta->reseller_id, $row->meta->username, $row->meta->password, $row->meta->sandbox == 'true');
             $api->loadCommand('srsx_domain');
-            $postfields["domain"] = $service->name;
-            $postfields["api_id"] = $service->name;
-            $postfields["periode"] = $_POST['renew'];
+            $postfields['domain'] = $service->name;
+            $postfields['api_id'] = $service->name;
+            $postfields['periode'] = $_POST['renew'];
             $domainAPI = new SrsxDomain($api);
             $status = $domainAPI->status($postfields);
             $domainrenewResult = $domainAPI->renew($postfields);
@@ -1254,7 +1253,7 @@ class Srsx extends RegistrarModule
             }
             //perpanjang
             $strtotime = strtotime($service->date_renews) + (365 * 24 * 60 * 60);
-            $this->Record->where("id", "=", $service->id)->update("services", array("date_renews" => date("Y-m-d H:i:s", $strtotime)));
+            $this->Record->where('id', '=', $service->id)->update('services', array('date_renews' => date('Y-m-d H:i:s', $strtotime)));
         }
         $view = ($show_content ? $view : 'tab_unavailable');
         $this->view = new View($view, 'default');
@@ -1271,17 +1270,17 @@ class Srsx extends RegistrarModule
         $row = $this->getModuleRow($package->module_row);
         $api = $this->getApi($row->meta->reseller_id, $row->meta->username, $row->meta->password, $row->meta->sandbox == 'true');
         $api->loadCommand('srsx_domain');
-        $postfields["domain"] = $service->name;
-        $postfields["api_id"] = $service->name;
+        $postfields['domain'] = $service->name;
+        $postfields['api_id'] = $service->name;
         $domainAPI = new SrsxDomain($api);
         $status = $domainAPI->status($postfields);
         if (isset($status->response_json()->resultData->domainstatus)) {
             return $status->response_json()->resultData->domainstatus;
         } else {
             //gagal mendapatkan status domain
-            return "failed";
+            return 'failed';
         }
-        return "failed";
+        return 'failed';
 
     }
 
@@ -1290,7 +1289,7 @@ class Srsx extends RegistrarModule
         $domainstatus = $this->domainstatus($view, $package, $service, $get, $post, $files);
         if ($domainstatus != 'active') {
             $uri_path = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
-            if (strpos($uri_path, "admin/clients")) {
+            if (strpos($uri_path, 'admin/clients')) {
                 $view = 'domain_not_active/admin/index';
             } else {
                 $view = 'domain_not_active/client/index';
@@ -1305,14 +1304,14 @@ class Srsx extends RegistrarModule
         $row = $this->getModuleRow($package->module_row);
         $api = $this->getApi($row->meta->reseller_id, $row->meta->username, $row->meta->password, $row->meta->sandbox == 'true');
         $api->loadCommand('srsx_domain');
-        $postfields["domain"] = $service->name;
+        $postfields['domain'] = $service->name;
         // $id = $_GET['id'];
         $domainAPI = new SrsxDomain($api);
         if (isset($_POST) && $_SERVER['REQUEST_METHOD'] == 'POST') {
             if ($_POST['action'] == 'init') {
                 unset($_POST['action']);
                 unset($_POST['_csrf_token']);
-                $_POST['domain'] = $postfields["domain"];
+                $_POST['domain'] = $postfields['domain'];
                 $domainAPI->forward_init($_POST);
                 $this->processResponseJson($domainAPI->forward_init($_POST));
                 if ($this->Input->errors()) {
@@ -1322,7 +1321,7 @@ class Srsx extends RegistrarModule
             if ($_POST['action'] == 'update') {
                 unset($_POST['action']);
                 unset($_POST['_csrf_token']);
-                $_POST['domain'] = $postfields["domain"];
+                $_POST['domain'] = $postfields['domain'];
                 $this->processResponseJson($domainAPI->forward_update($_POST));
                 if ($this->Input->errors()) {
                     return;
@@ -1330,19 +1329,19 @@ class Srsx extends RegistrarModule
             }
         }
         $record = (object) [
-            "target" => "",
-            "type" => "",
-            "header" => "",
-            "noframe" => "",
-            "subdomain" => "",
-            "path" => "",
+            'target' => '',
+            'type' => '',
+            'header' => '',
+            'noframe' => '',
+            'subdomain' => '',
+            'path' => '',
         ];
         $response = $domainAPI->forward_status($postfields);
         $status = true;
         if ($res = ($response->response_json())) {
             if ($res->result->resultMsg == "Domain Forwarding for {$postfields['domain']} isn't registered yet") {
                 $status = false;
-            } else if ($res->result->resultCode == 1000) {
+            } elseif ($res->result->resultCode == 1000) {
                 $record = $res->resultData;
             } else {
                 $this->processResponseJson($domainAPI->forward_status($postfields));
@@ -1352,7 +1351,7 @@ class Srsx extends RegistrarModule
             }
 
         } else {
-            $this->Input->setErrors(['errors' => ["error" => 'failed to decode json response']]);
+            $this->Input->setErrors(['errors' => ['error' => 'failed to decode json response']]);
             return;
         }
         $view = ($show_content ? $view : 'tab_unavailable');
@@ -1378,14 +1377,14 @@ class Srsx extends RegistrarModule
         $row = $this->getModuleRow($package->module_row);
         $api = $this->getApi($row->meta->reseller_id, $row->meta->username, $row->meta->password, $row->meta->sandbox == 'true');
         $api->loadCommand('srsx_domain');
-        $postfields["domain"] = $service->name;
+        $postfields['domain'] = $service->name;
         $id = $_GET['id'];
         $domainAPI = new SrsxDomain($api);
         $view = ($show_content ? $view : 'tab_unavailable');
         $this->view = new View($view, 'default');
         if (isset($_POST) && $_SERVER['REQUEST_METHOD'] == 'POST') {
             unset($_POST['_csrf_token']);
-            $_POST['domain'] = $postfields["domain"];
+            $_POST['domain'] = $postfields['domain'];
             $this->processResponseJson($domainAPI->dns_edit($_POST));
             if ($this->Input->errors()) {
                 return;
@@ -1418,13 +1417,13 @@ class Srsx extends RegistrarModule
         $row = $this->getModuleRow($package->module_row);
         $api = $this->getApi($row->meta->reseller_id, $row->meta->username, $row->meta->password, $row->meta->sandbox == 'true');
         $api->loadCommand('srsx_domain');
-        $postfields["domain"] = $service->name;
+        $postfields['domain'] = $service->name;
         $domainAPI = new SrsxDomain($api);
         $view = ($show_content ? $view : 'tab_unavailable');
         $this->view = new View($view, 'default');
         if (isset($_POST) && $_SERVER['REQUEST_METHOD'] == 'POST') {
             unset($_POST['_csrf_token']);
-            $_POST['domain'] = $postfields["domain"];
+            $_POST['domain'] = $postfields['domain'];
             $this->processResponseJson($domainAPI->dns_add($_POST));
             if ($this->Input->errors()) {
                 return;
@@ -1444,7 +1443,7 @@ class Srsx extends RegistrarModule
         $domainstatus = $this->domainstatus($view, $package, $service, $get, $post, $files);
         if ($domainstatus != 'active') {
             $uri_path = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
-            if (strpos($uri_path, "admin/clients")) {
+            if (strpos($uri_path, 'admin/clients')) {
                 $view = 'domain_not_active/admin/index';
             } else {
                 $view = 'domain_not_active/client/index';
@@ -1457,7 +1456,7 @@ class Srsx extends RegistrarModule
         if (isset($_GET['action'])) {
             if ($_GET['action'] == 'add_dns_management') {
                 return $this->add_dns_management($view, $package, $service, $get, $post, $files);
-            } else if ($_GET['action'] == 'edit_dns_management') {
+            } elseif ($_GET['action'] == 'edit_dns_management') {
                 return $this->edit_dns_management($view, $package, $service, $get, $post, $files);
             }
         }
@@ -1466,7 +1465,7 @@ class Srsx extends RegistrarModule
         $row = $this->getModuleRow($package->module_row);
         $api = $this->getApi($row->meta->reseller_id, $row->meta->username, $row->meta->password, $row->meta->sandbox == 'true');
         $api->loadCommand('srsx_domain');
-        $postfields["domain"] = $service->name;
+        $postfields['domain'] = $service->name;
         $domainAPI = new SrsxDomain($api);
         if (isset($_POST) && $_SERVER['REQUEST_METHOD'] == 'POST') {
             unset($_POST['_csrf_token']);
@@ -1477,21 +1476,21 @@ class Srsx extends RegistrarModule
                 } else {
                     header('Location: ?action=add_dns_management');
                 }
-            } else if ($_POST['action'] == 'edit_dns_management') {
+            } elseif ($_POST['action'] == 'edit_dns_management') {
                 if (isset($_POST['view'])) {
-                    header('Location: ?action=edit_dns_management&id=' . $_POST['id'] . "&view=" . $_POST['view']);
+                    header('Location: ?action=edit_dns_management&id=' . $_POST['id'] . '&view=' . $_POST['view']);
                 } else {
                     header('Location: ?action=edit_dns_management&id=' . $_POST['id']);
                 }
-            } else if ($_POST['action'] == 'delete') {
+            } elseif ($_POST['action'] == 'delete') {
                 unset($_POST['action']);
                 $_POST['dnsid'] = $_POST['id'];
-                $_POST['domain'] = $postfields["domain"];
+                $_POST['domain'] = $postfields['domain'];
                 $this->processResponseJson($domainAPI->dns_delete($_POST));
-            } else if ($_POST['action'] == 'init') {
+            } elseif ($_POST['action'] == 'init') {
                 $init = false;
                 unset($_POST['action']);
-                $_POST['domain'] = $postfields["domain"];
+                $_POST['domain'] = $postfields['domain'];
                 $this->processResponseJson($domainAPI->dns_init($_POST));
                 $dns_info = $domainAPI->dns_info($postfields);
                 if ($dns_info->response_json()->result->resultCode == 1000) {
@@ -1506,9 +1505,9 @@ class Srsx extends RegistrarModule
                 if (!$init) {
                     $this->processResponseJson($domainAPI->dns_init($_POST));
                 }
-            } else if ($_POST['action'] == 'update') {
+            } elseif ($_POST['action'] == 'update') {
                 unset($_POST['action']);
-                $_POST['domain'] = $postfields["domain"];
+                $_POST['domain'] = $postfields['domain'];
                 $dns_info = $domainAPI->dns_info($postfields);
                 $list = ($dns_info)->response_json()->resultData;
                 $_POST['nameserver'] = "{$list->reseller_ns1},{$list->reseller_ns2},{$list->reseller_ns3},{$list->reseller_ns4}";
@@ -1533,7 +1532,7 @@ class Srsx extends RegistrarModule
             ) {
                 $update = true;
             }
-    
+
             foreach ($list as $key => $l) {
                 if (strpos($key, 'dns') !== false) {
                     $init = true;
@@ -1567,7 +1566,7 @@ class Srsx extends RegistrarModule
         $domainstatus = $this->domainstatus($view, $package, $service, $get, $post, $files);
         if ($domainstatus != 'active') {
             $uri_path = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
-            if (strpos($uri_path, "admin/clients")) {
+            if (strpos($uri_path, 'admin/clients')) {
                 $view = 'domain_not_active/admin/index';
             } else {
                 $view = 'domain_not_active/client/index';
@@ -1582,17 +1581,17 @@ class Srsx extends RegistrarModule
         $row = $this->getModuleRow($package->module_row);
         $api = $this->getApi($row->meta->reseller_id, $row->meta->username, $row->meta->password, $row->meta->sandbox == 'true');
         $api->loadCommand('srsx_domain');
-        $postfields["domain"] = $service->name;
+        $postfields['domain'] = $service->name;
         $domainAPI = new SrsxDomain($api);
         if (isset($_POST) && $_SERVER['REQUEST_METHOD'] == 'POST') {
             unset($_POST['_csrf_token']);
             if ($_POST['action'] == 'add') {
                 unset($_POST['action']);
-                $_POST['domain'] = $postfields["domain"];
+                $_POST['domain'] = $postfields['domain'];
                 $this->processResponseJson($domainAPI->add_dnssec($_POST));
-            } else if ($_POST['action'] == 'delete') {
+            } elseif ($_POST['action'] == 'delete') {
                 unset($_POST['action']);
-                $_POST['domain'] = $postfields["domain"];
+                $_POST['domain'] = $postfields['domain'];
                 $this->processResponseJson($domainAPI->delete_dnssec($_POST));
             }
             if ($this->Input->errors()) {
@@ -1618,7 +1617,7 @@ class Srsx extends RegistrarModule
         $domainstatus = $this->domainstatus($view, $package, $service, $get, $post, $files);
         if ($domainstatus != 'active') {
             $uri_path = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
-            if (strpos($uri_path, "admin/clients")) {
+            if (strpos($uri_path, 'admin/clients')) {
                 $view = 'domain_not_active/admin/index';
             } else {
                 $view = 'domain_not_active/client/index';
@@ -1634,23 +1633,23 @@ class Srsx extends RegistrarModule
         $api = $this->getApi($row->meta->reseller_id, $row->meta->username, $row->meta->password, $row->meta->sandbox == 'true');
         $api->loadCommand('srsx_domain');
         $api->loadCommand('srsx_contact');
-        $postfields["domain"] = $service->name;
+        $postfields['domain'] = $service->name;
         unset($_POST['domainid']);
         $domainAPI = new SrsxDomain($api);
         if (isset($_POST) && $_SERVER['REQUEST_METHOD'] == 'POST') {
             unset($_POST['_csrf_token']);
             if ($_POST['action'] == 'register') {
                 unset($_POST['action']);
-                $_POST['domain'] = $postfields["domain"];
+                $_POST['domain'] = $postfields['domain'];
                 $this->processResponseJson($domainAPI->register_private_ns($_POST));
-            } else if ($_POST['action'] == 'update') {
+            } elseif ($_POST['action'] == 'update') {
                 unset($_POST['action']);
-                $_POST['domain'] = $postfields["domain"];
+                $_POST['domain'] = $postfields['domain'];
                 $this->processResponseJson($domainAPI->update_private_ns($_POST));
-            } else if ($_POST['action'] == 'delete') {
+            } elseif ($_POST['action'] == 'delete') {
                 unset($_POST['action']);
-                $_POST['domain'] = $postfields["domain"];
-                $_POST['nameserver'] = $_POST['nameserver'] . "." . $postfields["domain"];
+                $_POST['domain'] = $postfields['domain'];
+                $_POST['nameserver'] = $_POST['nameserver'] . '.' . $postfields['domain'];
                 $this->processResponseJson($domainAPI->delete_private_ns($_POST));
             }
             if ($this->Input->errors()) {
@@ -1707,7 +1706,7 @@ class Srsx extends RegistrarModule
             if ($idp->option_value == 0) {
                 return false;
             }
-            if (strtotime("now") <= strtotime("{$service->date_added} + {$idp->option_pricing_term} {$idp->option_pricing_period}")) {
+            if (strtotime('now') <= strtotime("{$service->date_added} + {$idp->option_pricing_term} {$idp->option_pricing_period}")) {
                 return true;
             }
         }
@@ -1722,9 +1721,9 @@ class Srsx extends RegistrarModule
             $row = $this->getModuleRow($package->module_row);
             $api = $this->getApi($row->meta->reseller_id, $row->meta->username, $row->meta->password, $row->meta->sandbox == 'true');
             $api->loadCommand('srsx_domain');
-            $postfields["domain"] = $service->name;
-            $postfields["api_id"] = $service->name;
-            $postfields["idprotection"] = $status ? 1 : 0;
+            $postfields['domain'] = $service->name;
+            $postfields['api_id'] = $service->name;
+            $postfields['idprotection'] = $status ? 1 : 0;
             $domainAPI = new SrsxDomain($api);
             $info = $domainAPI->set_idprotection($postfields);
             if (!$this->Input->errors()) {
@@ -1739,7 +1738,7 @@ class Srsx extends RegistrarModule
         $row = $this->getModuleRow($package->module_row);
         $api = $this->getApi($row->meta->reseller_id, $row->meta->username, $row->meta->password, $row->meta->sandbox == 'true');
         $api->loadCommand('srsx_domain');
-        $postfields["domain"] = $service->name;
+        $postfields['domain'] = $service->name;
         $domainAPI = new SrsxDomain($api);
         $info = $domainAPI->info($postfields);
         if ($info->status_json() == 'OK') {
@@ -1789,7 +1788,7 @@ class Srsx extends RegistrarModule
         $domainstatus = $this->domainstatus($view, $package, $service, $get, $post, $files);
         if ($domainstatus != 'active') {
             $uri_path = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
-            if (strpos($uri_path, "admin/clients")) {
+            if (strpos($uri_path, 'admin/clients')) {
                 $view = 'domain_not_active/admin/index';
             } else {
                 $view = 'domain_not_active/client/index';
@@ -1803,13 +1802,13 @@ class Srsx extends RegistrarModule
         if (isset($_GET['action'])) {
             if ($_GET['action'] == 'modifycontact') {
                 return $this->modifycontact($view, $package, $service, $get, $post, $files);
-            } else if ($_GET['action'] == 'changecontact') {
+            } elseif ($_GET['action'] == 'changecontact') {
                 return $this->changecontact($view, $package, $service, $get, $post, $files);
-            } else if ($_GET['action'] == 'createcontact') {
+            } elseif ($_GET['action'] == 'createcontact') {
                 return $this->createcontact($view, $package, $service, $get, $post, $files);
-            } else if ($_GET['action'] == 'deletecontact') {
+            } elseif ($_GET['action'] == 'deletecontact') {
                 return $this->deletecontact($view, $package, $service, $get, $post, $files);
-            } else if ($_GET['action'] == 'detailmodifycontact') {
+            } elseif ($_GET['action'] == 'detailmodifycontact') {
                 return $this->detailmodifycontact($view, $package, $service, $get, $post, $files);
             }
         }
@@ -1821,11 +1820,11 @@ class Srsx extends RegistrarModule
         $api = $this->getApi($row->meta->reseller_id, $row->meta->username, $row->meta->password, $row->meta->sandbox == 'true');
         $api->loadCommand('srsx_domain');
         $api->loadCommand('srsx_contact');
-        $postfields["domain"] = $service->name;
+        $postfields['domain'] = $service->name;
         $domainAPI = new SrsxDomain($api);
         $contactAPI = new SrsxContact($api);
         $domain_info = $domainAPI->info($postfields);
-        $type = ["registrant", "admin", "tech", "billing"];
+        $type = ['registrant', 'admin', 'tech', 'billing'];
         $contact_name_type = 'contact_' . $type[($_GET['tab'] - 1)];
         $contact_id = (string) $domain_info->response_json()->resultData->$contact_name_type;
         $postfields['contactid'] = $contact_id;
@@ -1849,13 +1848,13 @@ class Srsx extends RegistrarModule
         $api = $this->getApi($row->meta->reseller_id, $row->meta->username, $row->meta->password, $row->meta->sandbox == 'true');
         $api->loadCommand('srsx_contact');
         $api->loadCommand('srsx_domain');
-        $postfields["domain"] = $service->name;
+        $postfields['domain'] = $service->name;
         $contactAPI = new SrsxContact($api);
         $contact_info = $contactAPI->getallcontact($postfields);
         $contact = $contact_info->response_json()->resultData->contact;
         if (isset($_POST) && $_SERVER['REQUEST_METHOD'] == 'POST') {
             if (isset($_POST['view'])) {
-                header('Location: ?action=detailmodifycontact&id=' . $_POST['contactId'] . "&view=" . $_POST['view']);
+                header('Location: ?action=detailmodifycontact&id=' . $_POST['contactId'] . '&view=' . $_POST['view']);
             } else {
                 header('Location: ?action=detailmodifycontact&id=' . $_POST['contactId']);
             }
@@ -1881,7 +1880,7 @@ class Srsx extends RegistrarModule
         $api = $this->getApi($row->meta->reseller_id, $row->meta->username, $row->meta->password, $row->meta->sandbox == 'true');
         $api->loadCommand('srsx_contact');
         $contactAPI = new SrsxContact($api);
-        $postfields["domain"] = $service->name;
+        $postfields['domain'] = $service->name;
         $postfields['contactid'] = $_GET['id'];
         if (isset($_POST) && $_SERVER['REQUEST_METHOD'] == 'POST') {
             $this->processResponseJson($contactAPI->update($_POST));
@@ -1947,7 +1946,7 @@ class Srsx extends RegistrarModule
         $api = $this->getApi($row->meta->reseller_id, $row->meta->username, $row->meta->password, $row->meta->sandbox == 'true');
         $api->loadCommand('srsx_contact');
         $api->loadCommand('srsx_domain');
-        $postfields["domain"] = $service->name;
+        $postfields['domain'] = $service->name;
         $contactAPI = new SrsxContact($api);
         $domainAPI = new SrsxDomain($api);
         if (isset($_POST['contactId'])) {
@@ -1983,14 +1982,14 @@ class Srsx extends RegistrarModule
         $api = $this->getApi($row->meta->reseller_id, $row->meta->username, $row->meta->password, $row->meta->sandbox == 'true');
         $api->loadCommand('srsx_contact');
         $api->loadCommand('srsx_domain');
-        $postfields["domain"] = $service->name;
+        $postfields['domain'] = $service->name;
         $contactAPI = new SrsxContact($api);
         $domainAPI = new SrsxDomain($api);
         if (!empty($_POST)) {
-            $postfields["registrant_contact"] = $_POST['registrantContactId'];
-            $postfields["admin_contact"] = $_POST['adminContactId'];
-            $postfields["billing_contact"] = $_POST['billingContactId'];
-            $postfields["tech_contact"] = $_POST['techContactId'];
+            $postfields['registrant_contact'] = $_POST['registrantContactId'];
+            $postfields['admin_contact'] = $_POST['adminContactId'];
+            $postfields['billing_contact'] = $_POST['billingContactId'];
+            $postfields['tech_contact'] = $_POST['techContactId'];
             $this->processResponseJson($domainAPI->editcontact($postfields));
             if ($this->Input->errors()) {
                 return;
@@ -2021,7 +2020,7 @@ class Srsx extends RegistrarModule
         $vars = new stdClass();
         $api = $this->getApi($row->meta->reseller_id, $row->meta->username, $row->meta->password, $row->meta->sandbox == 'true');
         $api->loadCommand('srsx_domain');
-        $postfields["domain"] = $service->name;
+        $postfields['domain'] = $service->name;
         $domainAPI = new SrsxDomain($api);
         $send_email = false;
         $send_email_status = false;
@@ -2067,7 +2066,7 @@ class Srsx extends RegistrarModule
         $domainstatus = $this->domainstatus($view, $package, $service, $get, $post, $files);
         if ($domainstatus != 'active') {
             $uri_path = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
-            if (strpos($uri_path, "admin/clients")) {
+            if (strpos($uri_path, 'admin/clients')) {
                 $view = 'domain_not_active/admin/index';
             } else {
                 $view = 'domain_not_active/client/index';
@@ -2082,10 +2081,10 @@ class Srsx extends RegistrarModule
         $row = $this->getModuleRow($package->module_row);
         $api = $this->getApi($row->meta->reseller_id, $row->meta->username, $row->meta->password, $row->meta->sandbox == 'true');
         $api->loadCommand('srsx_domain');
-        $postfields["domain"] = $service->name;
+        $postfields['domain'] = $service->name;
         $domainAPI = new SrsxDomain($api);
         if (isset($_POST['epp'])) {
-            $postfields["eppcode"] = $_POST['epp'];
+            $postfields['eppcode'] = $_POST['epp'];
             $this->processResponseJson($domainAPI->epp_set($postfields));
             if ($this->Input->errors()) {
                 return;
@@ -2115,23 +2114,23 @@ class Srsx extends RegistrarModule
         # Is the TLD ".ID"?
         $show_content = false;
         $domainTld = $this->getTld($service->name);
-        if (in_array($domainTld, array(".ac.id", ".co.id", ".or.id", ".ponpes.id", ".sch.id", ".web.id"))) {
+        if (in_array($domainTld, array('.ac.id', '.co.id', '.or.id', '.ponpes.id', '.sch.id', '.web.id'))) {
             $show_content = true;
         }
         # Domain status API
         $api->loadCommand('srsx_domain');
         $domainAPI = new SrsxDomain($api);
         $postfields = [];
-        $postfields["domain"] = $service->name;
-        $postfields["api_id"] = $service->name;
+        $postfields['domain'] = $service->name;
+        $postfields['api_id'] = $service->name;
         # Get Domain Status
         $status = $domainstatusResult = $domainAPI->status_json($postfields)->response_json();
         if ($status = $domainstatusResult = ($status)) {
             if (isset($status->resultData->domainstatus)) {
-                $array = ["awaiting document", 'verifying'];
+                $array = ['awaiting document', 'verifying'];
                 if (!in_array($status->resultData->domainstatus, $array)) {
                     $uri_path = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
-                    if (strpos($uri_path, "admin/clients")) {
+                    if (strpos($uri_path, 'admin/clients')) {
                         $view = 'domainid/admin/not_awaiting';
                     } else {
                         $view = 'domainid/client/not_awaiting';
@@ -2141,18 +2140,18 @@ class Srsx extends RegistrarModule
                     return $this->view->fetch();
                 }
             } else {
-                $this->Input->setErrors(['errors' => ["error" => 'domainstatus is not set']]);
+                $this->Input->setErrors(['errors' => ['error' => 'domainstatus is not set']]);
 
             }
         } else {
-            $this->Input->setErrors(['errors' => ["error" => 'failed to decode json']]);
+            $this->Input->setErrors(['errors' => ['error' => 'failed to decode json']]);
 
         }
         if ($this->Input->errors()) {
             return;
         }
         # Set base URL
-        if (preg_match("/a/", $row->meta->reseller_id)) {
+        if (preg_match('/a/', $row->meta->reseller_id)) {
             $resellerId = substr($row->meta->reseller_id, 0, -1);
             $baseUrl = "https://srb{$resellerId}.alpha.srs-x.com";
         } else {
@@ -2205,11 +2204,11 @@ class Srsx extends RegistrarModule
             }
             # Update domain contact
             $postfields = [];
-            $postfields["domain"] = $service->name;
-            $postfields["registrant_contact"] = $post["contactid"];
-            $postfields["admin_contact"] = $post["contactid"];
-            $postfields["billing_contact"] = $post["contactid"];
-            $postfields["tech_contact"] = $post["contactid"];
+            $postfields['domain'] = $service->name;
+            $postfields['registrant_contact'] = $post['contactid'];
+            $postfields['admin_contact'] = $post['contactid'];
+            $postfields['billing_contact'] = $post['contactid'];
+            $postfields['tech_contact'] = $post['contactid'];
             $domaineditcontactResult = $domainAPI->editcontact($postfields);
             $this->processResponseJson($domaineditcontactResult);
             if ($this->Input->errors()) {
@@ -2220,7 +2219,7 @@ class Srsx extends RegistrarModule
         } elseif (property_exists($fields, 'domain-name')) {
             # Get contact ID
             $postfields = [];
-            $postfields["domain"] = $service->name;
+            $postfields['domain'] = $service->name;
             $domaininfoResult = $domainAPI->info($postfields);
             $this->processResponseJson($domaininfoResult);
             if ($this->Input->errors()) {
@@ -2229,8 +2228,8 @@ class Srsx extends RegistrarModule
             $contactid = ($domaininfoResult->response_json()->resultData->contact_registrant);
             # Contact information
             $postfields = [];
-            $postfields["contactid"] = $contactid;
-            $api->loadCommand("srsx_contact");
+            $postfields['contactid'] = $contactid;
+            $api->loadCommand('srsx_contact');
             $contactAPI = new SrsxContact($api);
             $contactinfoResult = $contactAPI->info($postfields);
             $this->processResponseJson($contactinfoResult);
@@ -2281,7 +2280,7 @@ class Srsx extends RegistrarModule
         $domainstatus = $this->domainstatus($view, $package, $service, $get, $post, $files);
         if ($domainstatus != 'active') {
             $uri_path = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
-            if (strpos($uri_path, "admin/clients")) {
+            if (strpos($uri_path, 'admin/clients')) {
                 $view = 'domain_not_active/admin/index';
             } else {
                 $view = 'domain_not_active/client/index';
@@ -2300,24 +2299,24 @@ class Srsx extends RegistrarModule
         $show_content = true;
         $tld = $this->getTld($fields->{'domain-name'});
         $sld = substr($fields->{'domain-name'}, 0, -strlen($tld));
-        
+
         if (!empty($post)) {
             $ns = [];
-            foreach ($post["ns"] as $i => $nameserver) {
-                if ($nameserver != "") {
+            foreach ($post['ns'] as $i => $nameserver) {
+                if ($nameserver != '') {
                     $ns[] = $nameserver;
                 }
             }
             $post['order-id'] = $fields->{'order-id'};
             $postfields = [];
-            $postfields["domain"] = $service->name;
-            $postfields["nameserver"] = implode(",", $ns);
+            $postfields['domain'] = $service->name;
+            $postfields['nameserver'] = implode(',', $ns);
             $domainupdatensResult = $domainAPI->updatens($postfields);
             $this->processResponseJson($domainupdatensResult);
             $vars = (object) $post;
         } else {
             $postfields = [];
-            $postfields["domain"] = $service->name;
+            $postfields['domain'] = $service->name;
             $domaininfoResult = $domainAPI->info($postfields)->response_json();
             $vars->ns = [];
             for ($i = 0; $i < 5; $i++) {
@@ -2326,7 +2325,7 @@ class Srsx extends RegistrarModule
                 }
             }
         }
-        
+
         $view = ($show_content ? $view : 'tab_unavailable');
         $this->view = new View($view, 'default');
         # Load the helpers required for this view
@@ -2342,7 +2341,7 @@ class Srsx extends RegistrarModule
         $domainstatus = $this->domainstatus($view, $package, $service, $get, $post, $files);
         if ($domainstatus != 'active') {
             $uri_path = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
-            if (strpos($uri_path, "admin/clients")) {
+            if (strpos($uri_path, 'admin/clients')) {
                 $view = 'domain_not_active/admin/index';
             } else {
                 $view = 'domain_not_active/client/index';
@@ -2363,11 +2362,11 @@ class Srsx extends RegistrarModule
             if (!empty($post)) {
                 if (isset($post['registrar_lock'])) {
                     $postfields = [];
-                    $postfields["domain"] = $service->name;
+                    $postfields['domain'] = $service->name;
                     if ($post['registrar_lock'] == 'true') {
-                        $postfields["reseller_lock"] = 1;
+                        $postfields['reseller_lock'] = 1;
                     } else {
-                        $postfields["reseller_lock"] = 0;
+                        $postfields['reseller_lock'] = 0;
                     }
                     $domainsetlockResult = $domainAPI->set_lock($postfields);
                     $this->processResponseJson($domainsetlockResult);
@@ -2375,7 +2374,7 @@ class Srsx extends RegistrarModule
                 $vars = (object) $post;
             } else {
                 $postfields = [];
-                $postfields["domain"] = $service->name;
+                $postfields['domain'] = $service->name;
                 $domaininfoResult = $domainAPI->info($postfields)->response_json();
                 if ($domaininfoResult) {
                     $vars->registrar_lock = 'false';
@@ -2404,17 +2403,17 @@ class Srsx extends RegistrarModule
     {
         $row = $this->getModuleRow($module_row_id);
         $api = $this->getApi($row->meta->reseller_id, $row->meta->username, $row->meta->password, $row->meta->sandbox == 'true');
-        $api->loadCommand("srsx_domain");
+        $api->loadCommand('srsx_domain');
         $domainAPI = new SrsxDomain($api);
         $postfields = array(
-            "domain" => $domain,
+            'domain' => $domain,
         );
         if (!$this->is_valid_domain_name($domain)) {
             // $this->Input->setErrors(['errors' => ["error" => 'invalid domain name']]);
             return false;
         }
         $domaininfoResult = $domainAPI->check($postfields);
-        if ($domaininfoResult->status() != "OK") {
+        if ($domaininfoResult->status() != 'OK') {
             return false;
         }
         return true;
@@ -2423,8 +2422,8 @@ class Srsx extends RegistrarModule
     public function is_valid_domain_name($domain_name)
     {
         return (preg_match("/^([a-z\d](-*[a-z\d])*)(\.([a-z\d](-*[a-z\d])*))*$/i", $domain_name) //valid chars check
-             && preg_match("/^.{1,253}$/", $domain_name) //overall length check
-             && preg_match("/^[^\.]{1,63}(\.[^\.]{1,63})*$/", $domain_name)); //length of each label
+            && preg_match('/^.{1,253}$/', $domain_name) //overall length check
+            && preg_match("/^[^\.]{1,63}(\.[^\.]{1,63})*$/", $domain_name)); //length of each label
     }
 
     private function getRowRules(&$vars)
@@ -2507,7 +2506,7 @@ class Srsx extends RegistrarModule
             $currencies[$currency->code] = $currency;
         }
 
-        $api->loadCommand("srsx_domain");
+        $api->loadCommand('srsx_domain');
         $domainAPI = new SrsxDomain($api);
         $domainResult = $domainAPI->get_pricelist();
         if ($domainResult->status() != 'OK') {
@@ -2587,11 +2586,11 @@ class Srsx extends RegistrarModule
         for ($year = 1; $year <= 10; $year++) {
             foreach ($tldPricings as $tld => $items) {
                 $pricing = $items[$srsx_currency];
-                if (($pricing[$year]['register'] <= 0) && 
-                    ($pricing[$year]['transfer'] <= 0) && 
+                if (($pricing[$year]['register'] <= 0) &&
+                    ($pricing[$year]['transfer'] <= 0) &&
                     ($pricing[$year]['renew']) <= 0) {
-                        unset($tldPricings[$tld][$srsx_currency][$year]);
-                    }
+                    unset($tldPricings[$tld][$srsx_currency][$year]);
+                }
             }
         }
 
@@ -2617,27 +2616,27 @@ class Srsx extends RegistrarModule
         if (!isset($this->Contacts)) {
             Loader::loadModels($this, ['Contacts']);
         }
-        return $this->Contacts->intlNumber($number, $country, ".");
+        return $this->Contacts->intlNumber($number, $country, '.');
     }
 
     private function logmessage($type = false, $message = false)
     {
-        $configDir = dirname(__FILE__) . DS . "logs";
+        $configDir = dirname(__FILE__) . DS . 'logs';
         if (!is_dir($configDir)) {
             mkdir($configDir);
         }
-        $file = "{$configDir}" . DS . "logsrsx-" . date('Y-m-d') . ".php";
+        $file = "{$configDir}" . DS . 'logsrsx-' . date('Y-m-d') . '.php';
         if (!file_exists($file)) {
             error_log("<?php defined(\"BASEPATH\") OR exit(\"No direct script access allowed\"); ?>\n\n", 3, $file);
         }
-        error_log("[" . date('Y-m-d H:i:s') . "] {$type} : {$message}\n", 3, $file);
+        error_log('[' . date('Y-m-d H:i:s') . "] {$type} : {$message}\n", 3, $file);
     }
 
     private function randomhash($length = 6)
     {
         $base = 'ABCDEFGHKLMNOPQRSTWXYZ123456789';
         $max = strlen($base) - 1;
-        $randomResult = "";
+        $randomResult = '';
         mt_srand((double) microtime() * 1000000);
         while (strlen($randomResult) < $length) {
             $randomResult .= $base[mt_rand(0, $max)];
