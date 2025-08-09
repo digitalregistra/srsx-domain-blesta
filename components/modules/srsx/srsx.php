@@ -384,7 +384,7 @@ class Srsx extends RegistrarModule
         // if($service->status != 'cancelled')
         $this->Record->where("id", "=", $service->id)->update("services", array("status" => $status));
         if (isset($domainResult->response_json()->resultData->unixenddate)) {
-            return $domainResult->response_json()->resultData->unixenddate;
+            return date($format, $domainResult->response_json()->resultData->unixenddate);
         }
         return null;
     }
