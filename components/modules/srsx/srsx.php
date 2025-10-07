@@ -1011,19 +1011,26 @@ class Srsx extends RegistrarModule
             'tabClientDomainForwarding' => Language::_('Srsx.tabDomainForwarding.title',true),
         );
 
-        $uri_path = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
-        $uri_segments = explode('/', $uri_path);
-        $service = $this->Record->select()->from("service_fields")->where('service_id', "=", $uri_segments[4])->where('key', "=", 'domain-name')->fetch();
+        $uri = $_SERVER['REQUEST_URI'];
+        $path = parse_url($uri, PHP_URL_PATH) ?? '/';
+        $segments = preg_split('~/+~', trim($path, '/'), -1, PREG_SPLIT_NO_EMPTY);
+        $lastSegment = $segments ? end($segments) : null;
 
+        
+        $service = $this->Record->select()->from("service_fields")->where('service_id', "=", $lastSegment)->where('key', "=", 'domain-name')->fetch();
         if ($service) {
             $array = array(".ac.id", ".co.id", ".or.id", ".ponpes.id", ".sch.id", ".web.id");
+
             foreach ($array as $a) {
+
                 if (strpos($service->value, $a) !== false) {
+
                     $data['tabClientDomainId'] = Language::_('Srsx.tab_domainid.title', true);
                     break;
                 }
             }
         }
+
         return $data;
     }
 
