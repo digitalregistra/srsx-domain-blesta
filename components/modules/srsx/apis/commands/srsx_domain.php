@@ -140,5 +140,8 @@ class SrsxDomain {
     public function set_idprotection($vars) {
         return $this->api->submit_json('domain/set_idprotection',$vars);
     }
+    public function get_pricelist(array $vars = []) {
+        return $this->api->submit_json('v2/domain/pricelist',$vars);
+    }
 
 }
