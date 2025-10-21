@@ -807,7 +807,7 @@ class Srsx extends RegistrarModule
     {
         // var_dump($vars);
         # Handle universal domain name
-        if (isset($vars->domain)) {
+        if (isset($vars->domain) && !empty($vars->domain)) {
             $vars->{'domain-name'} = $vars->domain;
         }
         # Set default name servers
@@ -867,8 +867,16 @@ class Srsx extends RegistrarModule
 
     private function buildDomainModuleFields($vars, $client = false)
     {
-        if (isset($vars->domain)) {
-            $tld = $this->getTld($vars->domain);
+        if (isset($vars->domain) && !empty($vars->domain)) {
+            $domain = $vars->domain;
+        }
+
+        if (isset($vars->{'domain-name'}) && !empty($vars->{'domain-name'})) {
+            $domain = $vars->domain;
+        }
+
+        if (isset($domain)) {
+            $tld = $this->getTld($domain);
 
             $extension_fields = Configure::get('Srsx.domain_fields' . $tld);
             if ($extension_fields) {
@@ -885,6 +893,9 @@ class Srsx extends RegistrarModule
                     // We should already have the domain name don't make editable
                     $fields['domain']['type'] = 'hidden';
                     $fields['domain']['label'] = null;
+
+                    $fields['domain-name']['type'] = 'hidden';
+                    $fields['domain-name']['label'] = null;
                 }
 
                 // Build the module fields
@@ -941,7 +952,7 @@ class Srsx extends RegistrarModule
             }
         }
 
-        return (isset($module_fields) ? $module_fields : false);
+        return isset($module_fields) ? $module_fields : false;
     }
 
     public function getAdminEditFields($package, $vars = null)
