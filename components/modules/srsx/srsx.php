@@ -135,8 +135,16 @@ class Srsx extends RegistrarModule
 
             $domainResult = $domainAPI->info($postfields);
             if ($domainResult->status_json() == 'OK') {
-                if ($domainResult->response_json()->resultData->status == 'active') {
+                if ($domainResult->response_json()->resultData->status == 'awaiting document') {
+                    Loader::loadComponents($this, ['Session']);
+                    $this->Session->write('blesta_flash', [
+                        'message' => 'domain berhasil diregistrasi namun statusnya masih tidak aktif.silahkan melengkapi dokumen jika belum dan mohon coba beberapa saat lagi',
+                        'type' => 'success'
+                    ]);
+                    return;
+                }
 
+                if ($domainResult->response_json()->resultData->status == 'active') {
                     $productid = ($domainResult->response_json()->resultData->productid);
                     return array(
                         array(
@@ -204,20 +212,32 @@ class Srsx extends RegistrarModule
             $array = array(".ac.id", ".co.id", ".or.id", ".ponpes.id", ".sch.id", ".web.id");
             if (($domainResult->response_json()->result->resultCode) == 1000) {
                 if (in_array($domainTld, $array) || (isset($vars["transfer"]) || isset($vars["epp-code"]))) {
-                    $this->Input->setErrors(['error' => ['errors' => "domain berhasil diregistrasi namun statusnya masih tidak aktif.silahkan melengkapi dokumen jika belum dan mohon coba beberapa saat lagi"]]);
+                    Loader::loadComponents($this, ['Session']);
+                    $this->Session->write('blesta_flash', [
+                        'message' => 'domain berhasil diregistrasi namun statusnya masih tidak aktif.silahkan melengkapi dokumen jika belum dan mohon coba beberapa saat lagi',
+                        'type' => 'success'
+                    ]);
                     return;
+
+                    // $this->Input->setErrors(['error' => ['errors' => "domain berhasil diregistrasi namun statusnya masih tidak aktif.silahkan melengkapi dokumen jika belum dan mohon coba beberapa saat lagi"]]);
+                    // return;
                 }
                 if (isset($domainResult->response_json()->resultData->productid)) {
                     $productid = ($domainResult->response_json()->resultData->productid);
                 }
             } else {
-
                 if (in_array($domainTld, $array) || (isset($vars["transfer"]) || isset($vars["epp-code"]))) {
-                    $this->Input->setErrors(['error' => ['errors' => "domain berhasil diregistrasi namun statusnya masih tidak aktif.silahkan melengkapi dokumen jika belum dan mohon coba beberapa saat lagi"]]);
+                    Loader::loadComponents($this, ['Session']);
+                    $this->Session->write('blesta_flash', [
+                        'message' => 'domain berhasil diregistrasi namun statusnya masih tidak aktif.silahkan melengkapi dokumen jika belum dan mohon coba beberapa saat lagi',
+                        'type' => 'success'
+                    ]);
                     return;
+
+                    // $this->Input->setErrors(['error' => ['errors' => "domain berhasil diregistrasi namun statusnya masih tidak aktif.silahkan melengkapi dokumen jika belum dan mohon coba beberapa saat lagi"]]);
+                    // return;
                 }
             }
-            // var_dump($domainResult->response_json());
             if (isset($domainResult->response_json()->result->resultMsg)) {
                 if (!($domainResult->response_json()->result->resultMsg == 'Domain registration has been submited to Registrar System, but domain name activation is waiting for documents to be uploaded. Please make sure your user upload required documents. Domain will not be verified until all documents has been uploaded.')) {
                     $this->processResponseJson($domainResult);
@@ -1020,6 +1040,7 @@ class Srsx extends RegistrarModule
             // 'tabClientDNSSEC' => Language::_('Srsx.tabClientDNSSEC.title',true),
             'tabClientDNS' => Language::_('Srsx.tabClientDNS.title',true),
             'tabClientDomainForwarding' => Language::_('Srsx.tabDomainForwarding.title',true),
+            'tabClientDomainId' => Language::_('Srsx.tab_domainid.title',true),
         );
 
         $uri = $_SERVER['REQUEST_URI'];
